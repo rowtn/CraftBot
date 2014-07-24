@@ -4,14 +4,15 @@ import com.google.common.collect.Lists;
 import jdk.nashorn.internal.runtime.Logging;
 import joptsimple.OptionSet;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CraftBot {
 
-	private Logger logger;
+	// private Logger logger;
 
 	public CraftBot(OptionSet options) {
-		this.logger = Logging.getLogger("CraftBot");
+		this.logger = Logging.getOrCreateLogger("CraftBot", Level.ALL);
 	}
 
 	public Logger getLogger() {

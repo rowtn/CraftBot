@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,8 +25,9 @@ public class Main {
 	public static void main(String[] args) {
 		OptionParser parser = new OptionParser();
 		parser.acceptsAll(asList("h", "help"), "Show this help dialog.");
-		OptionSpec<?> logAppend = parser.acceptsAll(asList("log-append"), "Whether to append to the log file").withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
-		OptionSpec<?> logFile = parser.acceptsAll(asList("log-file", "log"), "Specifies the log file name").withRequiredArg().ofType(File.class).defaultsTo(new File("output.log")).describedAs("Log filename");
+		OptionSpec<Boolean> logAppend = parser.acceptsAll(asList("log-append"), "Whether to append to the log file").withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
+		OptionSpec<File> logFile = parser.acceptsAll(asList("log-file", "log"), "Specifies the log file name").withRequiredArg().ofType(File.class).defaultsTo(new File("output.log")).describedAs("Log filename");
+		OptionSpec<SimpleDateFormat> dateFormat = parser.acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)").withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
 
 		OptionSet options;
 		try {
@@ -35,9 +37,9 @@ public class Main {
 			return;
 		}
 
-		boolean append = (boolean) options.valueOf("log-append");
+		boolean append = logAppend.value(options);
 		if(append) {
-			File file = (File) options.valueOf(logFile);
+			File file = logFile.value(options);
 			try {
 				if(!file.exists()) {
 					if(!file.createNewFile()) {
@@ -51,8 +53,10 @@ public class Main {
 				return;
 			}
 
+			SimpleDateFormat format = dateFormat.value(options);
+
 			try {
-				System.setOut(new CustomPrintStream(new FileOutputStream(file), System.out));
+				System.setOut(new CustomPrintStream(new FileOutputStream(file), System.out, format));
 			} catch(FileNotFoundException ex) {
 				// never
 			}
