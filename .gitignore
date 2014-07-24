@@ -1,0 +1,22 @@
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Java
+bin
+*.class
+
+# Maven
+target/
+
+# Mac crap
+.DS_Store
+
+# misc
+.project
+.classpath
+.settings
+dependency-reduced-pom.xml
+META-INF/application.xml

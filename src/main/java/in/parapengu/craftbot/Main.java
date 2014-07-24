@@ -1,0 +1,83 @@
+package in.parapengu.craftbot;
+
+import com.google.common.collect.Lists;
+import in.parapengu.commons.utils.file.TextFile;
+import jline.TerminalFactory;
+import jline.console.ConsoleReader;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Main {
+
+	private static CraftBot bot;
+
+	public static void main(String[] args) {
+		OptionParser parser = new OptionParser();
+		parser.acceptsAll(asList("h", "help"), "Show this help dialog.");
+		OptionSpec<?> logAppend = parser.acceptsAll(asList("log-append"), "Whether to append to the log file").withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
+		OptionSpec<?> logFile = parser.acceptsAll(asList("log-file", "log"), "Specifies the log file name").withRequiredArg().ofType(File.class).defaultsTo(new File("output.log")).describedAs("Log filename");
+
+		OptionSet options;
+		try {
+			options = parser.parse(args);
+		} catch (OptionException ex) {
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
+			return;
+		}
+
+		boolean append = (boolean) options.valueOf("log-append");
+		if(append) {
+			File file = (File) options.valueOf(logFile);
+			try {
+				if(!file.exists()) {
+					if(!file.createNewFile()) {
+						throw new IOException("Could not create log file");
+					}
+				} else if(!file.isFile()) {
+					throw new IOException("Could not create new log file because it was a directory");
+				}
+			} catch(IOException ex) {
+				ex.printStackTrace();
+				return;
+			}
+
+			try {
+				System.setOut(new CustomPrintStream(new FileOutputStream(file), System.out));
+			} catch(FileNotFoundException ex) {
+				// never
+			}
+		}
+
+		try {
+			ConsoleReader console = new ConsoleReader();
+			console.setPrompt("> ");
+			String line = null;
+			while ((line = console.readLine()) != null) {
+
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				TerminalFactory.get().restore();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static List<String> asList(String... params) {
+		return Lists.newArrayList(params);
+	}
+
+}
