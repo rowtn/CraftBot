@@ -58,12 +58,14 @@ public class Main {
 			}
 		}
 
+		CraftBot bot = new CraftBot(options);
+
 		try {
 			ConsoleReader console = new ConsoleReader();
 			console.setPrompt("> ");
 			String line = null;
 			while ((line = console.readLine()) != null) {
-
+				bot.run(line.split(" "));
 			}
 		} catch(IOException e) {
 			e.printStackTrace();
