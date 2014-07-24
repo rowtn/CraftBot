@@ -3,17 +3,13 @@ package in.parapengu.craftbot;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class CustomPrintStream extends PrintStream {
 	private final PrintStream second;
-	private final SimpleDateFormat format;
 
-	public CustomPrintStream(OutputStream main, PrintStream second, SimpleDateFormat format) {
+	public CustomPrintStream(OutputStream main, PrintStream second) {
 		super(main);
 		this.second = second;
-		this.format = format;
 	}
 
 	/**
@@ -49,12 +45,6 @@ public class CustomPrintStream extends PrintStream {
 	public void write(byte[] b) throws IOException {
 		super.write(b);
 		second.write(b);
-	}
-
-	@Override
-	public void write(String s) {
-		s += "[" + format.format(new Date()) + "] ";
-		super.print(s);
 	}
 
 }

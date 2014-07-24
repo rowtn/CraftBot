@@ -53,16 +53,15 @@ public class Main {
 				return;
 			}
 
-			SimpleDateFormat format = dateFormat.value(options);
-
 			try {
-				System.setOut(new CustomPrintStream(new FileOutputStream(file), System.out, format));
+				System.setOut(new CustomPrintStream(new FileOutputStream(file), System.out));
 			} catch(FileNotFoundException ex) {
 				// never
 			}
 		}
 
-		CraftBot bot = new CraftBot(options);
+		SimpleDateFormat format = dateFormat.value(options);
+		CraftBot bot = new CraftBot(options, format);
 
 		try {
 			ConsoleReader console = new ConsoleReader();

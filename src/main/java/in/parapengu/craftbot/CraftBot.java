@@ -1,18 +1,18 @@
 package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
-import jdk.nashorn.internal.runtime.Logging;
+import in.parapengu.craftbot.logging.Logger;
+import in.parapengu.craftbot.logging.Logging;
 import joptsimple.OptionSet;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.text.SimpleDateFormat;
 
 public class CraftBot {
 
-	// private Logger logger;
+	private Logger logger;
 
-	public CraftBot(OptionSet options) {
-		this.logger = Logging.getOrCreateLogger("CraftBot", Level.ALL);
+	public CraftBot(OptionSet options, SimpleDateFormat format) {
+		this.logger = Logging.getLogger(getClass()).setFormat(format);
 	}
 
 	public Logger getLogger() {
