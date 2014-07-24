@@ -38,4 +38,8 @@ public class Logging {
 		return getLogger(clazz.getSimpleName());
 	}
 
+	public static Logger getLogger() {
+		return getLogger((String) null);
+	}
+
 }

@@ -1,7 +1,7 @@
 package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
-import in.parapengu.commons.utils.file.TextFile;
+import in.parapengu.craftbot.bot.BotHandler;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import joptsimple.OptionException;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 public class Main {
 
-	private static CraftBot bot;
+	private static BotHandler bot;
 
 	public static void main(String[] args) {
 		OptionParser parser = new OptionParser();
@@ -61,14 +61,14 @@ public class Main {
 		}
 
 		SimpleDateFormat format = dateFormat.value(options);
-		CraftBot bot = new CraftBot(options, format);
+		BotHandler bot = new BotHandler(options, format);
 
 		try {
 			ConsoleReader console = new ConsoleReader();
 			console.setPrompt("> ");
 			String line = null;
 			while ((line = console.readLine()) != null) {
-				bot.run(line.split(" "));
+				bot.command(line.split(" "));
 			}
 		} catch(IOException e) {
 			e.printStackTrace();

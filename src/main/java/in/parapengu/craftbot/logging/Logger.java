@@ -28,7 +28,7 @@ public class Logger {
 	}
 
 	public String getPrefix() {
-		return (parent != null ? parent.getPrefix() : "") + "[" + name + "] ";
+		return (parent != null ? parent.getPrefix() : "") + (name != null ? "[" + name + "] " : "");
 	}
 
 	public LogLevel getLevel() {
