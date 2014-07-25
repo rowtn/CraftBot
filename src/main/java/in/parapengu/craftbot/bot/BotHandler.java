@@ -18,21 +18,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BotHandler {
 
 	private static BotHandler handler;
 
 	private Logger logger;
-	private List<CraftBot> bots;
+	private Map<String, CraftBot> bots;
 
 	private List<CommandHandler> commands;
 
 	public BotHandler(OptionSet options, SimpleDateFormat format) {
 		handler = this;
 		this.logger = Logging.getLogger().setFormat(format);
-		this.bots = new ArrayList<>();
+		this.bots = new HashMap<>();
 		this.commands = new ArrayList<>();
 		register(new StopCommand());
 		register(new PingCommand());
@@ -88,8 +90,16 @@ public class BotHandler {
 				continue;
 			}
 
-			bots.add(bot);
+			String uuid = bot.getUUID();
+			if(bots.get(uuid) != null) {
+				logger.warning(bot.getUsername() + " (" + uuid + ") is already a registered bot");
+				continue;
+			}
+
+			bots.put(uuid, bot);
 		}
+
+		logger.info("Loaded " + bots.size() + " account" + (bots.size() != 0 ? "s" : ""));
 	}
 
 	public Logger getLogger() {
