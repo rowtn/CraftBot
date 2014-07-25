@@ -84,8 +84,7 @@ public class BotHandler {
 			try {
 				bot = new CraftBot(username, password);
 			} catch(Exception ex) {
-				ex.printStackTrace();
-				logger.info("Error while authenticating " + username + ": " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName()));
+				logger.log("Error while authenticating " + username + ": ", ex);
 				continue;
 			}
 

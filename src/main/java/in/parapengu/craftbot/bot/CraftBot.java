@@ -2,6 +2,9 @@ package in.parapengu.craftbot.bot;
 
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
+import org.json.JSONException;
+
+import java.io.IOException;
 
 public class CraftBot {
 
@@ -11,7 +14,7 @@ public class CraftBot {
 	private String username;
 	private String uuid;
 
-	public CraftBot(String account, String password) {
+	public CraftBot(String account, String password) throws IOException, JSONException {
 		authenticator = new BotAuthenticator(account, password);
 		if(!authenticator.authenticate()) {
 			throw new IllegalArgumentException("Username/Password combination was invalid!");

@@ -81,7 +81,7 @@ public class Logger {
 		return this;
 	}
 
-	public Logger log(LogLevel level, Object... messages) {
+	public Logger log(LogLevel level, Object pre, Object... messages) {
 		if(level == DEBUG && !debug) {
 			return this;
 		}
@@ -94,34 +94,54 @@ public class Logger {
 				prefix = "[" + formatPre + (formatPre != null && levelPre != null ? " " : "") + levelPre + "] ";
 			}
 
-			String string = prefix + getPrefix() + message.toString();
+			String msg = message.toString();
+			if(message instanceof Exception) {
+				Exception ex = (Exception) message;
+				if(debug) {
+					ex.printStackTrace();
+					continue;
+				}
+
+				msg = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
+			}
+
+			if(pre != null) {
+				msg = pre.toString() + msg;
+			}
+
+			String string = prefix + getPrefix() + msg;
 			print(string);
 		}
 		return this;
 	}
 
 	public Logger log(Object... messages) {
-		log(level, messages);
+		log(level, null, messages);
 		return this;
 	}
 
 	public Logger debug(Object... messages) {
-		log(DEBUG, messages);
+		log(DEBUG, null, messages);
 		return this;
 	}
 
 	public Logger info(Object... messages) {
-		log(INFO, messages);
+		log(INFO, null, messages);
 		return this;
 	}
 
 	public Logger warning(Object... messages) {
-		log(WARNING, messages);
+		log(WARNING, null, messages);
 		return this;
 	}
 
 	public Logger severe(Object... messages) {
-		log(SEVERE, messages);
+		log(SEVERE, null, messages);
+		return this;
+	}
+
+	public Logger log(String prefix, Exception... exceptions) {
+		log(SEVERE, prefix, exceptions);
 		return this;
 	}
 
