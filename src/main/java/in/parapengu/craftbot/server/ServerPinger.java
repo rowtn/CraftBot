@@ -42,7 +42,9 @@ public class ServerPinger {
 				Map<String, String> map = new HashMap<>();
 				String pings = Packet.getString(in);
 				JSONObject json = new JSONObject(pings);
-				map.put("motd", stripColor(json.getString("description")));
+				String motd = stripColor(json.getString("description"));
+				motd = motd.contains("\n") ? "\n" + motd : motd;
+				map.put("motd", motd);
 				// if(json.has("favicon")) {
 				// 	map.put("favicon", json.getString("favicon").replace("data:image/png;base64,", ""));
 				// }
