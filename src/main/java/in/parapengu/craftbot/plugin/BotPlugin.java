@@ -14,6 +14,8 @@ import java.io.IOException;
 public abstract class BotPlugin {
 
 	private BotHandler handler;
+
+	private boolean enabled;
 	private PluginDescription description;
 	private Logger logger;
 
@@ -107,5 +109,31 @@ public abstract class BotPlugin {
 	public abstract void onEnable();
 
 	public abstract void onDisable();
+
+	public void setEnabled(boolean enabled) {
+		boolean update = this.enabled == enabled;
+		if(!update) {
+			return;
+		}
+
+		if(enabled) {
+			getLogger().info("Enabling " + getDescription().getName() + " v" + getDescription().getVersion());
+			try {
+				onEnable();
+				this.enabled = true;
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				logger.warning("An error occurred while enabling " + getDescription().getName() + ", is it up to date?");
+			}
+		} else {
+			getLogger().info("Disabling " + getDescription().getName() + " v" + getDescription().getVersion());
+			try {
+				this.enabled = false;
+				onDisable();
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 
 }

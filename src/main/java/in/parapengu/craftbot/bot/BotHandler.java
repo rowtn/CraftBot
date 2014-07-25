@@ -242,14 +242,7 @@ public class BotHandler {
 		logger.info("Loaded " + bots.size() + " account" + (bots.size() != 0 ? "s" : ""));
 
 		for(BotPlugin plugin : plugins) {
-			plugin.getLogger().info("Enabling " + plugin.getDescription().getName() + " v" + plugin.getDescription().getVersion());
-			try {
-				plugin.onEnable();
-			} catch(Exception ex) {
-				ex.printStackTrace();
-				logger.warning("An error occurred while enabling " + plugin.getDescription().getName() + ", is it up to date?");
-			}
-			plugin.getLogger().info(plugin.getDescription().getName() + " v" + plugin.getDescription().getVersion() + " has been enabled");
+			plugin.setEnabled(true);
 		}
 	}
 
@@ -358,14 +351,9 @@ public class BotHandler {
 
 	public void shutdown() {
 		for(BotPlugin plugin : plugins) {
-			plugin.getLogger().info("Disabling " + plugin.getDescription().getName() + " v" + plugin.getDescription().getVersion());
-			try {
-				plugin.onEnable();
-			} catch(Exception ex) {
-				ex.printStackTrace();
-			}
-			plugin.getLogger().info(plugin.getDescription().getName() + " v" + plugin.getDescription().getVersion() + " has been disabled");
+			plugin.setEnabled(false);
 		}
+
 		logger.warning("Shutting down CraftBot");
 		System.exit(0);
 	}
