@@ -25,6 +25,8 @@ public class ServerPinger {
 			clientSocket = new Socket();
 			clientSocket.connect(new InetSocketAddress(server, port), 5000);
 			long end = System.currentTimeMillis();
+			double ping = (double) (end - start) / 1000;
+
 			DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 			DataInputStream in = new DataInputStream(clientSocket.getInputStream());
 			ByteArrayDataOutput buf = ByteStreams.newDataOutput();
@@ -64,7 +66,7 @@ public class ServerPinger {
 				JSONObject players = json.getJSONObject("players");
 				map.put("players", players.getInt("online") + "");
 				map.put("max-players", players.getInt("max") + "");
-				map.put("ping", (end - start) + "ms");
+				map.put("socket-ping", ping + "s");
 				return map;
 			}
 
