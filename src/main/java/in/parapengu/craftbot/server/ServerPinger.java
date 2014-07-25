@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,10 @@ public class ServerPinger {
 	public static Map<String, String> ping(String server, int port) {
 		Socket clientSocket;
 		try {
-			clientSocket = new Socket(server, port);
+			long start = System.currentTimeMillis();
+			clientSocket = new Socket();
+			clientSocket.connect(new InetSocketAddress(server, port), 5000);
+			long end = System.currentTimeMillis();
 			DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 			DataInputStream in = new DataInputStream(clientSocket.getInputStream());
 			ByteArrayDataOutput buf = ByteStreams.newDataOutput();
@@ -60,6 +64,7 @@ public class ServerPinger {
 				JSONObject players = json.getJSONObject("players");
 				map.put("players", players.getInt("online") + "");
 				map.put("max-players", players.getInt("max") + "");
+				map.put("ping", (end - start) + "ms");
 				return map;
 			}
 
@@ -68,7 +73,7 @@ public class ServerPinger {
 			clientSocket.close();
 
 		} catch(Exception e) {
-			e.printStackTrace();
+			// nothing
 		}
 
 		return null;
