@@ -29,8 +29,7 @@ public class StopCommand extends CommandHandler {
 
 	@Override
 	public boolean execute(CommandContext context) {
-		BotHandler.getHandler().getLogger().warning("Shutting down CraftBot");
-		System.exit(0);
+		BotHandler.getHandler().shutdown();
 		return true;
 	}
 

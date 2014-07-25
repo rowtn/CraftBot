@@ -64,6 +64,15 @@ public class Logger {
 
 	public Logger setParent(Logger parent) {
 		this.parent = parent;
+		while(format == null && parent != null) {
+			if(parent.getFormat() != null) {
+				format = parent.getFormat();
+				break;
+			}
+
+			parent = parent.getParent();
+		}
+
 		return this;
 	}
 
@@ -78,7 +87,14 @@ public class Logger {
 		}
 
 		for(Object message : messages) {
-			String string = "[" + format.format(new Date()) + (level != null ? " " + level.name() : "") + "] " + getPrefix() + message.toString();
+			String prefix = "";
+			if(format != null || level != null) {
+				String formatPre = format != null ? format.format(new Date()) : "";
+				String levelPre = level != null ? level.name() : "";
+				prefix = "[" + formatPre + (formatPre != null && levelPre != null ? " " : "") + levelPre + "] ";
+			}
+
+			String string = prefix + getPrefix() + message.toString();
 			print(string);
 		}
 		return this;

@@ -1,13 +1,21 @@
 package in.parapengu.craftbot.bot;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandHandler;
 import in.parapengu.craftbot.command.commands.StopCommand;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 import joptsimple.OptionSet;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +35,61 @@ public class BotHandler {
 		this.bots = new ArrayList<>();
 		this.commands = new ArrayList<>();
 		register(new StopCommand());
+
+		File accountsFile = (File) options.valueOf("a");
+		if(!accountsFile.exists()) {
+			JSONArray array = new JSONArray();
+			JSONObject account = new JSONObject();
+			account.put("username", "Steve");
+			account.put("password", "password");
+			array.put(account);
+
+			try {
+				TextFile file = new TextFile(accountsFile);
+				file.line(array.toString(2));
+				file.save();
+				logger.info("Created a new " + accountsFile.toPath() + " - this needs to be updated.");
+			} catch(IOException ex) {
+				ex.printStackTrace();
+			}
+
+			shutdown();
+		}
+
+		List<String> lines;
+		try {
+			lines = Files.readAllLines(accountsFile.toPath(), Charsets.UTF_8);
+		} catch(IOException ex) {
+			throw new IllegalArgumentException("Could not read accounts from " + accountsFile.getPath());
+		}
+
+		StringBuilder builder = new StringBuilder();
+		lines.forEach(builder::append);
+
+		JSONArray accounts = new JSONArray(builder.toString());
+		for(int i = 0; i < accounts.length(); i++) {
+			JSONObject object = accounts.getJSONObject(i);
+			String username;
+			String password;
+			try {
+				username = object.getString("username");
+				password = object.getString("password");
+			} catch(JSONException ex) {
+				logger.info("Error while parsing " + accountsFile.toPath() + ": " + ex.getMessage());
+				continue;
+			}
+
+			CraftBot bot;
+			try {
+				bot = new CraftBot(username, password);
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				logger.info("Error while authenticating " + username + ": " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName()));
+				continue;
+			}
+
+			bots.add(bot);
+		}
 	}
 
 	public Logger getLogger() {
@@ -83,6 +146,11 @@ public class BotHandler {
 		if(handler != null) {
 			commands.remove(handler);
 		}
+	}
+
+	public void shutdown() {
+		logger.warning("Shutting down CraftBot");
+		System.exit(0);
 	}
 
 	public static BotHandler getHandler() {

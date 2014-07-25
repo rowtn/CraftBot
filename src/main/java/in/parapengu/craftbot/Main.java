@@ -1,6 +1,7 @@
 package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
+import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.bot.BotHandler;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
@@ -8,6 +9,8 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +31,7 @@ public class Main {
 		OptionSpec<Boolean> logAppend = parser.acceptsAll(asList("log-append"), "Whether to append to the log file").withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
 		OptionSpec<File> logFile = parser.acceptsAll(asList("log-file", "log"), "Specifies the log file name").withRequiredArg().ofType(File.class).defaultsTo(new File("output.log")).describedAs("Log filename");
 		OptionSpec<SimpleDateFormat> dateFormat = parser.acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)").withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
+		OptionSpec<File> accountsFile = parser.acceptsAll(asList("a", "accounts"), "Specifies the accounts file").withRequiredArg().ofType(File.class).defaultsTo(new File("accounts.json")).describedAs("Accounts filename");
 
 		OptionSet options;
 		try {
@@ -58,6 +62,11 @@ public class Main {
 			} catch(FileNotFoundException ex) {
 				// never
 			}
+		}
+
+		File accounts = accountsFile.value(options);
+		if(accounts.exists() && !accounts.isFile()) {
+			throw new IllegalArgumentException(accounts.getPath() + " exists and is not a file");
 		}
 
 		SimpleDateFormat format = dateFormat.value(options);
