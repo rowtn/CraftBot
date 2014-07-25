@@ -2,14 +2,24 @@ package in.parapengu.craftbot.command;
 
 public class CommandContext {
 
-	private String[] args;
+	private String label;
+	private String[] arguments;
 
-	public CommandContext() {
-		this.args = new String[0];
+	public CommandContext(String label) {
+		this.label = label;
+		this.arguments = new String[0];
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public String[] getArguments() {
+		return arguments;
 	}
 
 	public CommandContext setArguments(String[] args) {
-		this.args = args;
+		this.arguments = args;
 		return this;
 	}
 

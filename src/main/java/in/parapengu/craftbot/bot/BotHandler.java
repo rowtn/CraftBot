@@ -1,10 +1,10 @@
 package in.parapengu.craftbot.bot;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
 import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandHandler;
+import in.parapengu.craftbot.command.commands.PingCommand;
 import in.parapengu.craftbot.command.commands.StopCommand;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
@@ -35,6 +35,7 @@ public class BotHandler {
 		this.bots = new ArrayList<>();
 		this.commands = new ArrayList<>();
 		register(new StopCommand());
+		register(new PingCommand());
 
 		File accountsFile = (File) options.valueOf("a");
 		if(!accountsFile.exists()) {
@@ -110,8 +111,12 @@ public class BotHandler {
 			return;
 		}
 
-		CommandContext context = new CommandContext().setArguments(args);
+		CommandContext context = new CommandContext(label).setArguments(args);
 		handler.run(context);
+	}
+
+	public List<CommandHandler> getCommands() {
+		return commands;
 	}
 
 	public CommandHandler getHandler(String alias) {

@@ -2,23 +2,19 @@ package in.parapengu.craftbot.server;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import in.parapengu.craftbot.protocol.Packet;
+import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class ServerPinger {
 
-	/*
-	public Map<String, String> ping(String server, int port) {
-		Socket clientSocket = c.clientSocket;
-		TorchGUI gui = c.gui;
-		Logger netlog = c.netlog;
+	public static Map<String, String> ping(String server, int port) {
+		Socket clientSocket;
 		try {
 			clientSocket = new Socket(server, port);
 			DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
@@ -26,7 +22,7 @@ public class ServerPinger {
 			ByteArrayDataOutput buf = ByteStreams.newDataOutput();
 			Packet.writeVarInt(buf, 0);
 			Packet.writeVarInt(buf, 4);
-			Packet.writeString(buf, c.servername);
+			Packet.writeString(buf, server);
 			buf.writeShort(port);
 			Packet.writeVarInt(buf, 1);
 			Packet.sendPacket(buf, out);
@@ -39,36 +35,37 @@ public class ServerPinger {
 			int id = Packet.readVarInt(in);
 
 			if(id == 0) {
+				Map<String, String> map = new HashMap<>();
 				String pings = Packet.getString(in);
-				System.out.println("Pings: " + pings);
-				JSONObject json = (JSONObject) JSONSerializer.toJSON(pings);
-				JSONObject version = json.getJSONObject("version");
-				String prot = version.getString("name");
-				String ver = version.getString("protocol");
-				JSONObject players = json.getJSONObject("players");
-				String max = players.getString("max");
-				String online = players.getString("online");
-				String text = json.getString("description");
-				if(json.containsKey("favicon")) {
-					String images = json.getString("favicon").replace("data:image/png;base64,", "");
-					byte[] data = Base64.decode(images);
-					InputStream is = new ByteArrayInputStream(data);
-					ImageIcon test = new ImageIcon(data);
-					gui.favicon.setIcon(test);
-					gui.repaint();
+				JSONObject json = new JSONObject(pings);
+				map.put("motd", json.getString("description"));
+				if(json.has("favicon")) {
+					map.put("favicon", json.getString("favicon").replace("data:image/png;base64,", ""));
 				}
-				gui.addText("�5Game version: " + ver + "  " + text + " " + online + "/" + max);
+
+				JSONObject version = json.getJSONObject("version");
+				map.put("version", version.getString("name"));
+				if(version.get("protocol").getClass().equals(String.class)) {
+					map.put("protocol", version.getString("protocol"));
+				} else {
+					map.put("protocol", version.getInt("protocol") + "");
+				}
+
+				JSONObject players = json.getJSONObject("players");
+				map.put("players", players.getInt("online") + "");
+				map.put("max-players", players.getInt("max") + "");
+				return map;
 			}
+
 			out.close();
 			in.close();
 			clientSocket.close();
 
-		} catch(IOException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
-	*/
 
 }
