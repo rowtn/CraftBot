@@ -3,6 +3,8 @@ package in.parapengu.craftbot.protocol;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
+import java.io.IOException;
+
 public abstract class Packet {
 
 	private byte id;
@@ -10,6 +12,10 @@ public abstract class Packet {
 
 	protected Packet(byte id) {
 		this.id = id;
+	}
+
+	protected Packet(int id) {
+		this.id = (byte) id;
 	}
 
 	public byte getId() {
@@ -20,8 +26,8 @@ public abstract class Packet {
 		return destination;
 	}
 
-	public abstract void build(PacketInputStream input);
+	public abstract void build(PacketInputStream input) throws IOException;
 
-	public abstract void send(PacketOutputStream output);
+	public abstract void send(PacketOutputStream output) throws IOException;
 
 }

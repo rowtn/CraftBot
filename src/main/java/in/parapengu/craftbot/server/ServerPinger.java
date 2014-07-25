@@ -2,7 +2,7 @@ package in.parapengu.craftbot.server;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import in.parapengu.craftbot.protocol.PacketStream;
+import in.parapengu.craftbot.protocol.stream.PacketStream;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;

@@ -1,4 +1,4 @@
-package in.parapengu.craftbot.protocol;
+package in.parapengu.craftbot.protocol.stream;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;

@@ -66,4 +66,31 @@ public class PacketInputStream extends DataInputStream {
 		return data;
 	}
 
+
+
+	public static ItemStack readItemStack() throws IOException {
+		ItemStack item = null;
+		short id = in.readShort();
+
+		if(id >= 0) {
+			byte stackSize = in.readByte();
+			short damage = in.readShort();
+			item = new BasicItemStack(id, stackSize, damage);
+			item.setStackTagCompound(readNBTTagCompound(in));
+		}
+
+		return item;
+	}
+
+	public static NBTTagCompound readNBTTagCompound() throws IOException {
+		short length = in.readShort();
+
+		if(length >= 0) {
+			byte[] data = new byte[length];
+			in.readFully(data);
+			return CompressedStreamTools.decompress(data);
+		} else
+			return null;
+	}
+
 }
