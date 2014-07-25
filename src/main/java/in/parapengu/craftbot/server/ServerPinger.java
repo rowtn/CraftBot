@@ -2,7 +2,7 @@ package in.parapengu.craftbot.server;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import in.parapengu.craftbot.protocol.Packet;
+import in.parapengu.craftbot.protocol.PacketStream;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
@@ -30,23 +30,23 @@ public class ServerPinger {
 			DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 			DataInputStream in = new DataInputStream(clientSocket.getInputStream());
 			ByteArrayDataOutput buf = ByteStreams.newDataOutput();
-			Packet.writeVarInt(buf, 0);
-			Packet.writeVarInt(buf, 4);
-			Packet.writeString(buf, server);
+			PacketStream.writeVarInt(buf, 0x00);
+			PacketStream.writeVarInt(buf, 4);
+			PacketStream.writeString(buf, server);
 			buf.writeShort(port);
-			Packet.writeVarInt(buf, 1);
-			Packet.sendPacket(buf, out);
+			PacketStream.writeVarInt(buf, 1);
+			PacketStream.sendPacket(buf, out);
 
 			buf = ByteStreams.newDataOutput();
-			Packet.writeVarInt(buf, 0);
-			Packet.sendPacket(buf, out);
+			PacketStream.writeVarInt(buf, 0x00);
+			PacketStream.sendPacket(buf, out);
 
-			Packet.readVarInt(in);
-			int id = Packet.readVarInt(in);
+			PacketStream.readVarInt(in);
+			int id = PacketStream.readVarInt(in);
 
-			if(id == 0) {
+			if(id == 0x00) {
 				Map<String, String> map = new HashMap<>();
-				String pings = Packet.getString(in);
+				String pings = PacketStream.getString(in);
 				JSONObject json = new JSONObject(pings);
 				String motd = stripColor(json.getString("description"));
 				motd = motd.contains("\n") ? "\n" + motd : motd;
