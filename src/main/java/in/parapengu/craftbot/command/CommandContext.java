@@ -23,16 +23,27 @@ public class CommandContext {
 		return this;
 	}
 
-	public int getInteger(int arg) {
-		return Integer.parseInt(arguments[arg]);
+	public boolean getBoolean(int index) {
+		String arg = arguments[index].toLowerCase();
+		if(arg.equals("1") || arg.equals("true") || arg.equals("on")) {
+			return true;
+		} else if(arg.equals("0") || arg.equals("false") || arg.equals("off")) {
+			return false;
+		}
+
+		throw new IllegalArgumentException("\"" + arg + "\" is not a valid boolean");
 	}
 
-	public double getDouble(int arg) {
-		return Double.parseDouble(arguments[arg]);
+	public int getInteger(int index) {
+		return Integer.parseInt(arguments[index]);
 	}
 
-	public float getFloat(int arg) {
-		return Float.parseFloat(arguments[arg]);
+	public double getDouble(int index) {
+		return Double.parseDouble(arguments[index]);
+	}
+
+	public float getFloat(int index) {
+		return Float.parseFloat(arguments[index]);
 	}
 
 }

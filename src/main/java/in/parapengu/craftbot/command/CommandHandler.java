@@ -1,6 +1,7 @@
 package in.parapengu.craftbot.command;
 
 import in.parapengu.craftbot.bot.BotHandler;
+import in.parapengu.craftbot.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +23,25 @@ public abstract class CommandHandler {
 			// magic
 		}
 
+		Logger logger = BotHandler.getHandler().getLogger();
 		try {
 			boolean success = execute(context);
 			if(!success) {
 				String help = getHelp();
-				BotHandler.getHandler().getLogger().warning("Incorrect command usage:");
-				BotHandler.getHandler().getLogger().warning(context.getLabel() + (help != null ? " " + help : ""));
+				logger.warning("Incorrect command usage:");
+				logger.warning(context.getLabel() + (help != null ? " " + help : ""));
 			}
 		} catch(CommandException ex) {
-			BotHandler.getHandler().getLogger().warning(ex.getMessage());
+			logger.warning(ex.getMessage());
 		} catch(NumberFormatException ex) {
-			BotHandler.getHandler().getLogger().warning("Number expected, string supplied...");
+			logger.warning("Number expected, string supplied...");
+		} catch(IllegalArgumentException ex) {
+			boolean debug = logger.isDebug();
+			logger.setDebug(false);
+			logger.log((String) null, ex);
+			logger.setDebug(debug);
+		} catch(Exception ex) {
+			logger.log((String) null, ex);
 		}
 	}
 
