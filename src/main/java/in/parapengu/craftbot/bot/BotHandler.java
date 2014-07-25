@@ -12,6 +12,7 @@ import in.parapengu.craftbot.command.commands.StopCommand;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 import in.parapengu.craftbot.plugin.BotPlugin;
+import in.parapengu.craftbot.plugin.ClassPathLoader;
 import in.parapengu.craftbot.plugin.PluginDescription;
 import joptsimple.OptionSet;
 import org.apache.commons.io.IOUtils;
@@ -147,16 +148,23 @@ public class BotHandler {
 					}
 				}
 
+				try {
+					ClassPathLoader.addFile(file);
+				} catch(IOException ex) {
+					logger.info("Invalid plugin.json for " + name + ": Could not load " + file.getName() + " into the classpath");
+					continue;
+				}
+
 				Class<?> plugin;
 				try {
 					plugin = Class.forName(main);
 				} catch(ClassNotFoundException ex) {
-					logger.info("Invalid plugin.json for " + name);
+					logger.info("Invalid plugin.json for " + name + ": " + main + " does not exist");
 					continue;
 				}
 
 				if(!BotPlugin.class.isAssignableFrom(plugin)) {
-					logger.info("Invalid plugin.json for " + name);
+					logger.info("Invalid plugin.json for " + name + ": " + main + " is not assignable from " + BotPlugin.class.getSimpleName());
 					continue;
 				}
 
