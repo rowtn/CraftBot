@@ -24,7 +24,7 @@ public class StopCommand extends CommandHandler {
 
 	@Override
 	public String getHelp() {
-		return "";
+		return null;
 	}
 
 	@Override

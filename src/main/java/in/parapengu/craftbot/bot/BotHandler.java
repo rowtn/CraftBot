@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandHandler;
+import in.parapengu.craftbot.command.commands.HelpCommand;
 import in.parapengu.craftbot.command.commands.PingCommand;
 import in.parapengu.craftbot.command.commands.StopCommand;
 import in.parapengu.craftbot.logging.Logger;
@@ -38,6 +39,7 @@ public class BotHandler {
 		this.commands = new ArrayList<>();
 		register(new StopCommand());
 		register(new PingCommand());
+		register(new HelpCommand());
 
 		File accountsFile = (File) options.valueOf("a");
 		if(!accountsFile.exists()) {

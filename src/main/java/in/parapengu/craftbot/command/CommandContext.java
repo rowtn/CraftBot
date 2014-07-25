@@ -23,4 +23,16 @@ public class CommandContext {
 		return this;
 	}
 
+	public int getInteger(int arg) {
+		return Integer.parseInt(arguments[arg]);
+	}
+
+	public double getDouble(int arg) {
+		return Double.parseDouble(arguments[arg]);
+	}
+
+	public float getFloat(int arg) {
+		return Float.parseFloat(arguments[arg]);
+	}
+
 }

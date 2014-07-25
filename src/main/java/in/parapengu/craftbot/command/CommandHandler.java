@@ -25,8 +25,9 @@ public abstract class CommandHandler {
 		try {
 			boolean success = execute(context);
 			if(!success) {
+				String help = getHelp();
 				BotHandler.getHandler().getLogger().warning("Incorrect command usage:");
-				BotHandler.getHandler().getLogger().warning(context.getLabel() + " " + getHelp());
+				BotHandler.getHandler().getLogger().warning(context.getLabel() + (help != null ? " " + help : ""));
 			}
 		} catch(CommandException ex) {
 			BotHandler.getHandler().getLogger().warning(ex.getMessage());
