@@ -10,8 +10,12 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ServerPinger {
+
+	public static final char COLOR_CHAR = '\u00A7';
+	private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR) + "[0-9A-FK-OR]");
 
 	public static Map<String, String> ping(String server, int port) {
 		Socket clientSocket;
@@ -38,10 +42,10 @@ public class ServerPinger {
 				Map<String, String> map = new HashMap<>();
 				String pings = Packet.getString(in);
 				JSONObject json = new JSONObject(pings);
-				map.put("motd", json.getString("description"));
-				if(json.has("favicon")) {
-					map.put("favicon", json.getString("favicon").replace("data:image/png;base64,", ""));
-				}
+				map.put("motd", stripColor(json.getString("description")));
+				// if(json.has("favicon")) {
+				// 	map.put("favicon", json.getString("favicon").replace("data:image/png;base64,", ""));
+				// }
 
 				JSONObject version = json.getJSONObject("version");
 				map.put("version", version.getString("name"));
@@ -66,6 +70,14 @@ public class ServerPinger {
 		}
 
 		return null;
+	}
+
+	public static String stripColor(final String input) {
+		if (input == null) {
+			return null;
+		}
+
+		return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
 	}
 
 }
