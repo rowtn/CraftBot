@@ -1,6 +1,6 @@
 package in.parapengu.craftbot.logging;
 
-import static in.parapengu.craftbot.logging.LogLevel.*;
+import static in.parapengu.craftbot.logging.LogLevel.INFO;
 
 public class Logging {
 

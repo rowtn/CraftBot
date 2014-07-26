@@ -368,7 +368,7 @@ public enum Material {
 		this.data = data;
 		try {
 			this.constructor = data.getDeclaredConstructor(int.class, byte.class);
-		} catch (NoSuchMethodException | SecurityException ex) {
+		} catch(NoSuchMethodException | SecurityException ex) {
 			throw new AssertionError(ex);
 		}
 	}
@@ -383,6 +383,16 @@ public enum Material {
 
 	Material(int id) {
 		this(id, 64);
+	}
+
+	public static Material getMaterial(int id) {
+		for(Material material : values()) {
+			if(material.getId() == id) {
+				return material;
+			}
+		}
+
+		return null;
 	}
 
 	public int getId() {
@@ -408,16 +418,6 @@ public enum Material {
 			BotHandler.getHandler().getLogger().log("Failed to create " + this.data.getSimpleName() + ": ", ex);
 			return null;
 		}
-	}
-
-	public static Material getMaterial(int id) {
-		for(Material material : values()) {
-			if(material.getId() == id) {
-				return material;
-			}
-		}
-
-		return null;
 	}
 
 }

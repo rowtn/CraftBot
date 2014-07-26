@@ -246,6 +246,10 @@ public class BotHandler {
 		}
 	}
 
+	public static BotHandler getHandler() {
+		return handler;
+	}
+
 	public Logger getLogger() {
 		return logger;
 	}
@@ -356,10 +360,6 @@ public class BotHandler {
 
 		logger.warning("Shutting down CraftBot");
 		System.exit(0);
-	}
-
-	public static BotHandler getHandler() {
-		return handler;
 	}
 
 }

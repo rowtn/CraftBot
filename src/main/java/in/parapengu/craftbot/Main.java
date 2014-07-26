@@ -1,7 +1,6 @@
 package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
-import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.bot.BotHandler;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
@@ -9,8 +8,6 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,7 +34,7 @@ public class Main {
 		OptionSet options;
 		try {
 			options = parser.parse(args);
-		} catch (OptionException ex) {
+		} catch(OptionException ex) {
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
 			return;
 		}
@@ -82,7 +79,7 @@ public class Main {
 			ConsoleReader console = new ConsoleReader();
 			console.setPrompt("> ");
 			String line = null;
-			while ((line = console.readLine()) != null) {
+			while((line = console.readLine()) != null) {
 				bot.command(line.split(" "));
 			}
 		} catch(IOException e) {

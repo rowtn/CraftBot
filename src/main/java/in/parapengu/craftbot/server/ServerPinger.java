@@ -82,7 +82,7 @@ public class ServerPinger {
 	}
 
 	public static String stripColor(final String input) {
-		if (input == null) {
+		if(input == null) {
 			return null;
 		}
 

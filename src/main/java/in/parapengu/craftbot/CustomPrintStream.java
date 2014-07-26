@@ -15,6 +15,7 @@ public class CustomPrintStream extends PrintStream {
 	/**
 	 * Closes the main stream.
 	 * The second stream is just flushed but <b>not</b> closed.
+	 *
 	 * @see java.io.PrintStream#close()
 	 */
 	@Override

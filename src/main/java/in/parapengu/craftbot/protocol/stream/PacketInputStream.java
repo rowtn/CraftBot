@@ -69,7 +69,6 @@ public class PacketInputStream extends DataInputStream {
 	}
 
 
-
 	public ItemStack readItemStack() throws IOException {
 		ItemStack item = null;
 		short id = readShort();

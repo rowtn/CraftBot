@@ -23,6 +23,10 @@ public class BotAuthenticator {
 		this.password = password;
 	}
 
+	public static String toString(InputStream input) throws IOException {
+		return IOUtils.toString(input);
+	}
+
 	public boolean authenticate() throws IOException, JSONException {
 		URL var4 = new URL("https://authserver.mojang.com/authenticate");
 		HttpURLConnection hc = (HttpURLConnection) var4.openConnection();
@@ -67,10 +71,6 @@ public class BotAuthenticator {
 
 	public String getProfileName() {
 		return result.get("selected-profile-name");
-	}
-
-	public static String toString(InputStream input) throws IOException {
-		return IOUtils.toString(input);
 	}
 
 }

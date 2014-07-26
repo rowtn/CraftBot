@@ -42,7 +42,7 @@ public class ItemStack {
 		this.type = type;
 		this.amount = amount;
 		this.durability = damage;
-		if (data != null) {
+		if(data != null) {
 			createData(data);
 			this.durability = data;
 		}
@@ -104,10 +104,10 @@ public class ItemStack {
 	public void setData(MaterialData data) {
 		Material type = getType();
 
-		if (data == null || type == null || type.getData() == null) {
+		if(data == null || type == null || type.getData() == null) {
 			this.data = data;
 		} else {
-			if ((data.getClass() == type.getData()) || (data.getClass() == MaterialData.class)) {
+			if((data.getClass() == type.getData()) || (data.getClass() == MaterialData.class)) {
 				this.data = data;
 			} else {
 				throw new IllegalArgumentException("Provided data is not of type " + type.getData().getName() + ", found " + data.getClass().getName());

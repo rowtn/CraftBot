@@ -5,10 +5,6 @@ import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandException;
 import in.parapengu.craftbot.command.CommandHandler;
 import in.parapengu.craftbot.logging.Logger;
-import in.parapengu.craftbot.util.PaginatedResult;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DebugCommand extends CommandHandler {
 
