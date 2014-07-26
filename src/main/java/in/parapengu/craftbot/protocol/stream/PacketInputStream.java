@@ -1,10 +1,12 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import in.parapengu.craftbot.inventory.ItemStack;
+import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
+import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
+
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public class PacketInputStream extends DataInputStream {
@@ -68,26 +70,26 @@ public class PacketInputStream extends DataInputStream {
 
 
 
-	public static ItemStack readItemStack() throws IOException {
+	public ItemStack readItemStack() throws IOException {
 		ItemStack item = null;
-		short id = in.readShort();
+		short id = readShort();
 
 		if(id >= 0) {
-			byte stackSize = in.readByte();
-			short damage = in.readShort();
-			item = new BasicItemStack(id, stackSize, damage);
-			item.setStackTagCompound(readNBTTagCompound(in));
+			byte stackSize = readByte();
+			short damage = readShort();
+			item = new ItemStack(id, stackSize, damage);
+			item.setCompound(readNBTTagCompound());
 		}
 
 		return item;
 	}
 
-	public static NBTTagCompound readNBTTagCompound() throws IOException {
-		short length = in.readShort();
+	public NBTTagCompound readNBTTagCompound() throws IOException {
+		short length = readShort();
 
 		if(length >= 0) {
 			byte[] data = new byte[length];
-			in.readFully(data);
+			readFully(data);
 			return CompressedStreamTools.decompress(data);
 		} else
 			return null;

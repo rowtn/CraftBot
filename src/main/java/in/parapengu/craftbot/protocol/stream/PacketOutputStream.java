@@ -1,5 +1,9 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import in.parapengu.craftbot.inventory.ItemStack;
+import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
+import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +46,28 @@ public class PacketOutputStream extends DataOutputStream {
 	public void writeByteArray(byte[] data) throws IOException {
 		writeShort(data.length);
 		write(data);
+	}
+
+	public void writeItemStack(ItemStack item) throws IOException {
+		if(item != null) {
+			writeShort(item.getTypeId());
+			writeByte(item.getAmount());
+			writeShort((short) item.getData().getData());
+
+			writeNBTTagCompound(item.getCompound());
+		} else {
+			writeShort(-1);
+		}
+	}
+
+	public void writeNBTTagCompound(NBTTagCompound compound) throws IOException {
+		if(compound != null) {
+			byte[] data = CompressedStreamTools.compress(compound);
+			writeShort((short) data.length);
+			write(data);
+		} else {
+			writeShort(-1);
+		}
 	}
 
 }
