@@ -107,21 +107,7 @@ public class BotHandler {
 				continue;
 			}
 
-			CraftBot bot;
-			try {
-				bot = new CraftBot(username, password);
-			} catch(Exception ex) {
-				logger.log("Error while authenticating " + username + ": ", ex);
-				continue;
-			}
-
-			String uuid = bot.getUUID();
-			if(bots.get(uuid) != null) {
-				logger.warning(bot.getUsername() + " (" + uuid + ") is already a registered bot");
-				continue;
-			}
-
-			bots.put(uuid, bot);
+			register(username, password);
 		}
 
 		logger.info("Loaded " + bots.size() + " account" + (bots.size() != 0 ? "s" : ""));
@@ -137,6 +123,28 @@ public class BotHandler {
 
 	public Logger getLogger() {
 		return logger;
+	}
+
+	public Map<String, CraftBot> getBots() {
+		return bots;
+	}
+
+	public void register(String username, String password) {
+		CraftBot bot;
+		try {
+			bot = new CraftBot(username, password);
+		} catch(Exception ex) {
+			logger.log("Error while authenticating " + username + ": ", ex);
+			return;
+		}
+
+		String uuid = bot.getUUID();
+		if(bots.get(uuid) != null) {
+			logger.warning(bot.getUsername() + " (" + uuid + ") is already a registered bot");
+			return;
+		}
+
+		bots.put(uuid, bot);
 	}
 
 	public void command(String[] params) {
