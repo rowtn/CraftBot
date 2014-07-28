@@ -92,7 +92,7 @@ public class Logger {
 			String prefix = "";
 			if(format != null || level != null) {
 				String formatPre = format != null ? format.format(new Date()) : "";
-				String levelPre = level != null ? level.name() : "";
+				String levelPre = level != null ? level.getColor().toConsole() + level.name() + ChatColor.RESET.toConsole() : null;
 				prefix = "[" + formatPre + (formatPre != null && levelPre != null ? " " : "") + levelPre + "] ";
 			}
 
@@ -112,7 +112,7 @@ public class Logger {
 				msg = pre.toString() + msg;
 			}
 
-			String string = prefix + getPrefix() + msg;
+			String string = prefix + getPrefix() + msg + ChatColor.RESET.toConsole();
 			print(string);
 		}
 		return this;
@@ -145,6 +145,11 @@ public class Logger {
 
 	public Logger log(String prefix, Exception... exceptions) {
 		log(SEVERE, prefix, exceptions);
+		return this;
+	}
+
+	public Logger log(Exception... exceptions) {
+		log(SEVERE, "", exceptions);
 		return this;
 	}
 
