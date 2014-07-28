@@ -34,12 +34,11 @@ public class HelpCommand extends CommandHandler {
 	}
 
 	@Override
-	public boolean execute(CommandContext context) throws CommandException {
+	public boolean execute(String label, CommandContext context, Logger sender) throws CommandException {
 		if(context.getArguments().length > 1) {
 			return false;
 		}
 
-		Logger logger = BotHandler.getHandler().getLogger();
 		List<String> rows = new ArrayList<>();
 		List<CommandHandler> commands = BotHandler.getHandler().getCommands();
 		for(CommandHandler handler : commands) {
@@ -54,7 +53,7 @@ public class HelpCommand extends CommandHandler {
 			page = context.getInteger(0);
 		}
 
-		result.display(logger, page);
+		result.display(sender, page);
 		return true;
 	}
 

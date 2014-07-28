@@ -110,6 +110,10 @@ public abstract class BotPlugin {
 
 	public abstract void onDisable();
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+
 	public void setEnabled(boolean enabled) {
 		boolean update = this.enabled == enabled;
 		if(!update) {

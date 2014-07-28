@@ -269,7 +269,7 @@ public class BotHandler {
 		}
 
 		CommandContext context = new CommandContext(label).setArguments(args);
-		handler.run(context);
+		handler.run(label, context, logger);
 	}
 
 	public List<CommandHandler> getCommands() {

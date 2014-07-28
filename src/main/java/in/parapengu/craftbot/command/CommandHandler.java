@@ -16,16 +16,16 @@ public abstract class CommandHandler {
 
 	public abstract String getHelp();
 
-	public abstract boolean execute(CommandContext context) throws CommandException;
+	public abstract boolean execute(String label, CommandContext context, Logger sender) throws CommandException;
 
-	public void run(CommandContext context) {
+	public void run(String label, CommandContext context, Logger sender) {
 		if(subCommands.size() > 0) {
 			// magic
 		}
 
 		Logger logger = BotHandler.getHandler().getLogger();
 		try {
-			boolean success = execute(context);
+			boolean success = execute(label, context, sender);
 			if(!success) {
 				String help = getHelp();
 				logger.warning("Incorrect command usage:");

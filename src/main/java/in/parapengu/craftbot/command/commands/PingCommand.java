@@ -4,6 +4,7 @@ import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandException;
 import in.parapengu.craftbot.command.CommandHandler;
+import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.server.ServerPinger;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ public class PingCommand extends CommandHandler {
 	}
 
 	@Override
-	public boolean execute(CommandContext context) throws CommandException {
+	public boolean execute(String label, CommandContext context, Logger sender) throws CommandException {
 		if(context.getArguments().length != 1) {
 			return false;
 		}
@@ -56,7 +57,7 @@ public class PingCommand extends CommandHandler {
 
 		for(String key : result.keySet()) {
 			String value = result.get(key);
-			BotHandler.getHandler().getLogger().info(key + ": " + value);
+			sender.info(key + ": " + value);
 		}
 		return true;
 	}

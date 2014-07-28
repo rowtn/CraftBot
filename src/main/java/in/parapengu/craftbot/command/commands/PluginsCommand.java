@@ -1,11 +1,12 @@
 package in.parapengu.craftbot.command.commands;
 
 import in.parapengu.craftbot.bot.BotHandler;
+import in.parapengu.craftbot.bot.ChatColor;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandException;
 import in.parapengu.craftbot.command.CommandHandler;
 import in.parapengu.craftbot.logging.Logger;
-import in.parapengu.craftbot.util.PaginatedResult;
+import in.parapengu.craftbot.plugin.BotPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,27 +35,36 @@ public class PluginsCommand extends CommandHandler {
 	}
 
 	@Override
-	public boolean execute(CommandContext context) throws CommandException {
+	public boolean execute(String label, CommandContext context, Logger sender) throws CommandException {
+		String search = null;
 		if(context.getArguments().length > 1) {
-			return false;
+			StringBuilder builder = new StringBuilder();
+			for(int i = 0; i < context.getArguments().length; i++) {
+				if(i != 0) {
+					builder.append(" ");
+				}
+
+				builder.append(context.getArguments()[i]);
+			}
+			search = builder.toString();
 		}
 
-		Logger logger = BotHandler.getHandler().getLogger();
-		List<String> rows = new ArrayList<>();
-		List<CommandHandler> commands = BotHandler.getHandler().getCommands();
-		for(CommandHandler handler : commands) {
-			String help = handler.getHelp();
-			String message = handler.getAliases()[0] + (help != null ? " " + help : "") + " - " + handler.getDescription();
-			rows.add(message);
+		final String fSearch = search;
+		List<BotPlugin> plugins = new ArrayList<>(BotHandler.getHandler().getPlugins());
+		BotHandler.getHandler().getPlugins().stream().filter(plugin -> fSearch != null && !plugin.getDescription().getName().toLowerCase().startsWith(fSearch)).forEach(plugins::remove);
+
+		StringBuilder builder = new StringBuilder("Plugins (" + plugins.size() + "): ");
+		for(int i = 0; i < plugins.size(); i++) {
+			if(i != 0) {
+				builder.append(", ");
+			}
+
+			BotPlugin plugin = plugins.get(i);
+			String append = (plugin.isEnabled() ? ChatColor.GREEN : ChatColor.RED) + plugin.getDescription().getName() + ChatColor.RESET;
+			builder.append(append);
 		}
 
-		PaginatedResult result = new PaginatedResult("=========[ [page] of [pages] ]=========", rows, 10, false);
-		int page = 1;
-		if(context.getArguments().length == 1) {
-			page = context.getInteger(0);
-		}
-
-		result.display(logger, page);
+		sender.info(builder.toString());
 		return true;
 	}
 

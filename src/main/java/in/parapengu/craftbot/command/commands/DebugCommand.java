@@ -30,27 +30,26 @@ public class DebugCommand extends CommandHandler {
 	}
 
 	@Override
-	public boolean execute(CommandContext context) throws CommandException {
+	public boolean execute(String label, CommandContext context, Logger sender) throws CommandException {
 		if(context.getArguments().length > 1) {
 			return false;
 		}
 
-		Logger logger = BotHandler.getHandler().getLogger();
-		boolean set = !logger.isDebug();
+		boolean set = !sender.isDebug();
 		String status = set ? "enabled" : "disabled";
 		if(context.getArguments().length == 1) {
 			boolean update = context.getBoolean(0);
 			status = update ? "enabled" : "disabled";
 			if(update == !set) {
-				logger.info("Debug mode is already " + status);
+				sender.info("Debug mode is already " + status);
 				return true;
 			}
 
 			set = update;
 		}
 
-		logger.setDebug(set);
-		logger.info("Debug mode has been " + status);
+		sender.setDebug(set);
+		sender.info("Debug mode has been " + status);
 		return true;
 	}
 

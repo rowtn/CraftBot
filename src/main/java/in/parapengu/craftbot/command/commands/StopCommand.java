@@ -3,6 +3,7 @@ package in.parapengu.craftbot.command.commands;
 import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandHandler;
+import in.parapengu.craftbot.logging.Logger;
 
 public class StopCommand extends CommandHandler {
 
@@ -28,7 +29,7 @@ public class StopCommand extends CommandHandler {
 	}
 
 	@Override
-	public boolean execute(CommandContext context) {
+	public boolean execute(String label, CommandContext context, Logger sender) {
 		BotHandler.getHandler().shutdown();
 		return true;
 	}
