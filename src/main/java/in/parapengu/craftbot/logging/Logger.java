@@ -1,5 +1,7 @@
 package in.parapengu.craftbot.logging;
 
+import in.parapengu.craftbot.bot.ChatColor;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -105,6 +107,7 @@ public class Logger {
 				msg = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
 			}
 
+			msg = ChatColor.getConsoleString(msg);
 			if(pre != null) {
 				msg = pre.toString() + msg;
 			}
