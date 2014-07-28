@@ -4,8 +4,8 @@ import in.parapengu.craftbot.bot.ChatColor;
 
 public enum LogLevel {
 
-	DEBUG(ChatColor.WHITE),
-	INFO(ChatColor.AQUA),
+	DEBUG(ChatColor.AQUA),
+	INFO(ChatColor.WHITE),
 	WARNING(ChatColor.GOLD),
 	SEVERE(ChatColor.RED);
 

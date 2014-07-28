@@ -13,6 +13,8 @@ public class CraftBot {
 
 	private String username;
 	private String uuid;
+	private String clientToken;
+	private String accessToken;
 
 	public CraftBot(String account, String password) throws IOException, JSONException {
 		authenticator = new BotAuthenticator(account, password);
@@ -22,6 +24,8 @@ public class CraftBot {
 
 		username = authenticator.getProfileName();
 		uuid = authenticator.getProfileID();
+		clientToken = authenticator.getClientToken();
+		accessToken = authenticator.getAccessToken();
 
 		logger = Logging.getLogger(username, BotHandler.getHandler().getLogger());
 		logger.info("Connected as " + username + " (" + uuid + ")");
@@ -31,12 +35,24 @@ public class CraftBot {
 		return logger;
 	}
 
+	public BotAuthenticator getAuthenticator() {
+		return authenticator;
+	}
+
 	public String getUsername() {
 		return username;
 	}
 
 	public String getUUID() {
 		return uuid;
+	}
+
+	public String getClientToken() {
+		return clientToken;
+	}
+
+	public String getAccessToken() {
+		return accessToken;
 	}
 
 }
