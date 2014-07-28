@@ -15,7 +15,7 @@ public abstract class BotPlugin {
 
 	private BotHandler handler;
 
-	private boolean enabled;
+	private boolean enabled = false;
 	private PluginDescription description;
 	private Logger logger;
 
@@ -115,8 +115,9 @@ public abstract class BotPlugin {
 	}
 
 	public void setEnabled(boolean enabled) {
-		boolean update = this.enabled == enabled;
+		boolean update = this.enabled != enabled;
 		if(!update) {
+			getLogger().info(getDescription().getName() + " is already " + (enabled ? "enabled" : "disabled"));
 			return;
 		}
 
