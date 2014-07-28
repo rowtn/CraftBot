@@ -16,7 +16,7 @@ public class PluginsCommand extends CommandHandler {
 	private String[] aliases;
 
 	public PluginsCommand() {
-		this.aliases = new String[]{"help", "?"};
+		this.aliases = new String[]{"plugins", "pl"};
 	}
 
 	@Override
