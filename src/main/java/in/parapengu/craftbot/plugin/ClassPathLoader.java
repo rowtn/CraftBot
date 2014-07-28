@@ -8,16 +8,16 @@ import java.net.URLClassLoader;
 
 public class ClassPathLoader {
 
-	public static void addFile(String s) throws IOException {
+	public static URLClassLoader addFile(String s) throws IOException {
 		File f = new File(s);
-		addFile(f);
+		return addFile(f);
 	}
 
-	public static void addFile(File f) throws IOException {
-		addURL(f.toURI().toURL());
+	public static URLClassLoader addFile(File f) throws IOException {
+		return addURL(f.toURI().toURL());
 	}
 
-	public static void addURL(URL u) throws IOException {
+	public static URLClassLoader addURL(URL u) throws IOException {
 		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 		Class sysclass = URLClassLoader.class;
 
@@ -29,6 +29,14 @@ public class ClassPathLoader {
 			t.printStackTrace();
 			throw new IOException("Error, could not add URL to system classloader");
 		}
+
+		return sysloader;
 	}
+
+	/*
+	public static URLClassLoader addURL(URL u) throws IOException {
+		return URLClassLoader.newInstance(new URL[]{u}, ClassLoader.getSystemClassLoader());
+	}
+	*/
 
 }

@@ -26,32 +26,28 @@ public class PluginsCommand extends CommandHandler {
 
 	@Override
 	public String getDescription() {
-		return "Displays this help message";
+		return "Lists all the plugins";
 	}
 
 	@Override
 	public String getHelp() {
-		return "[page]";
+		return "[search]";
 	}
 
 	@Override
 	public boolean execute(String label, CommandContext context, Logger sender) throws CommandException {
 		String search = null;
-		if(context.getArguments().length > 1) {
-			StringBuilder builder = new StringBuilder();
-			for(int i = 0; i < context.getArguments().length; i++) {
-				if(i != 0) {
-					builder.append(" ");
-				}
-
-				builder.append(context.getArguments()[i]);
-			}
-			search = builder.toString();
+		if(context.getArguments().length > 0) {
+			search = context.getJoinedStrings(0);
 		}
 
 		final String fSearch = search;
-		List<BotPlugin> plugins = new ArrayList<>(BotHandler.getHandler().getPlugins());
-		BotHandler.getHandler().getPlugins().stream().filter(plugin -> fSearch != null && !plugin.getDescription().getName().toLowerCase().startsWith(fSearch)).forEach(plugins::remove);
+		List<BotPlugin> plugins = new ArrayList<>();
+		for(BotPlugin plugin : BotHandler.getHandler().getPlugins()) {
+			if(fSearch == null || plugin.getDescription().getName().toLowerCase().startsWith(fSearch)) {
+				plugins.add(plugin);
+			}
+		}
 
 		StringBuilder builder = new StringBuilder("Plugins (" + plugins.size() + "): ");
 		for(int i = 0; i < plugins.size(); i++) {

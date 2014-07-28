@@ -23,6 +23,19 @@ public class CommandContext {
 		return this;
 	}
 
+	public String getJoinedStrings(int start) {
+		StringBuilder builder = new StringBuilder();
+		for(int i = start; i < getArguments().length; i++) {
+			if(i != start) {
+				builder.append(" ");
+			}
+
+			builder.append(getArguments()[i]);
+		}
+
+		return builder.toString();
+	}
+
 	public boolean getBoolean(int index) {
 		String arg = arguments[index].toLowerCase();
 		if(arg.equals("1") || arg.equals("true") || arg.equals("on")) {

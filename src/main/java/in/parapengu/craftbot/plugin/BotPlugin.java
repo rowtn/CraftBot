@@ -10,10 +10,13 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLClassLoader;
 
 public abstract class BotPlugin {
 
 	private BotHandler handler;
+	private URLClassLoader loader;
+	private File file;
 
 	private boolean enabled = false;
 	private PluginDescription description;

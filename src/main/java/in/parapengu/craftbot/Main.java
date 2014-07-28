@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import in.parapengu.craftbot.bot.BotHandler;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
+import jline.console.completer.CompletionHandler;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -78,6 +79,10 @@ public class Main {
 		try {
 			ConsoleReader console = new ConsoleReader();
 			console.setPrompt("> ");
+			console.setCompletionHandler((reader, candidates, position) -> {
+				bot.getLogger().info(candidates);
+				return false;
+			});
 			String line = null;
 			while((line = console.readLine()) != null) {
 				bot.command(line.split(" "));

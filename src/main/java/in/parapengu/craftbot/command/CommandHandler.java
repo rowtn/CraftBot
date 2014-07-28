@@ -1,6 +1,7 @@
 package in.parapengu.craftbot.command;
 
 import in.parapengu.craftbot.bot.BotHandler;
+import in.parapengu.craftbot.bot.ChatColor;
 import in.parapengu.craftbot.logging.Logger;
 
 import java.util.ArrayList;
@@ -32,16 +33,16 @@ public abstract class CommandHandler {
 				logger.warning(context.getLabel() + (help != null ? " " + help : ""));
 			}
 		} catch(CommandException ex) {
-			logger.warning(ex.getMessage());
+			logger.warning(ChatColor.RED + ex.getMessage());
 		} catch(NumberFormatException ex) {
-			logger.warning("Number expected, string supplied...");
+			logger.warning(ChatColor.RED + "Number expected, string supplied...");
 		} catch(IllegalArgumentException ex) {
 			boolean debug = logger.isDebug();
 			logger.setDebug(false);
-			logger.log((String) null, ex);
+			logger.log(ex);
 			logger.setDebug(debug);
 		} catch(Exception ex) {
-			logger.log((String) null, ex);
+			logger.log(ex);
 		}
 	}
 

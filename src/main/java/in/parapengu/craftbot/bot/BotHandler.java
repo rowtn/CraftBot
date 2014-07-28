@@ -9,6 +9,7 @@ import in.parapengu.craftbot.command.commands.DebugCommand;
 import in.parapengu.craftbot.command.commands.HelpCommand;
 import in.parapengu.craftbot.command.commands.PingCommand;
 import in.parapengu.craftbot.command.commands.PluginsCommand;
+import in.parapengu.craftbot.command.commands.ReloadCommand;
 import in.parapengu.craftbot.command.commands.StopCommand;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,137 +50,18 @@ public class BotHandler {
 	public BotHandler(OptionSet options, SimpleDateFormat format) {
 		handler = this;
 		plugins = new ArrayList<>();
-		this.logger = Logging.getLogger().setFormat(format);
-		this.bots = new HashMap<>();
-		this.commands = new ArrayList<>();
+		pluginsFolder = (File) options.valueOf("p");
+		logger = Logging.getLogger().setFormat(format);
+		bots = new HashMap<>();
+		commands = new ArrayList<>();
 		register(new StopCommand());
 		register(new PingCommand());
 		register(new PluginsCommand());
 		register(new HelpCommand());
 		register(new DebugCommand());
+		register(new ReloadCommand());
 
-		pluginsFolder = (File) options.valueOf("p");
-		if(!pluginsFolder.exists()) {
-			if(pluginsFolder.mkdirs()) {
-				logger.info("Plugins folder did not exist, created one at " + pluginsFolder.getPath());
-			} else {
-				logger.info("Failed to create plugins folder at " + pluginsFolder.getPath());
-				shutdown();
-				return;
-			}
-		}
-
-		if(!pluginsFolder.isDirectory()) {
-			logger.info("The plugins folder, " + pluginsFolder.getPath() + " is a directory");
-			shutdown();
-			return;
-		}
-
-		for(File file : pluginsFolder.listFiles()) {
-			if(file.getName().toLowerCase().endsWith(".jar")) {
-				JarFile jar;
-				try {
-					jar = new JarFile(file, true);
-				} catch(IOException ex) {
-					logger.log("Could not load plugin at " + file.getPath() + ": ", ex);
-					continue;
-				}
-
-				ZipEntry entry = jar.getEntry("plugin.json");
-				String string;
-				try {
-					InputStream stream = jar.getInputStream(entry);
-					string = IOUtils.toString(stream);
-				} catch(IOException ex) {
-					logger.log("Could not load plugin at " + file.getPath() + ": ", ex);
-					continue;
-				}
-
-				JSONObject manifest;
-				try {
-					manifest = new JSONObject(string);
-				} catch(JSONException ex) {
-					logger.log("Could not load " + file.getName() + " because it's plugin.json was not valid: ", ex);
-					continue;
-				}
-
-				String name;
-				try {
-					name = manifest.getString("name");
-					if(name == null) {
-						throw new NullPointerException("name");
-					}
-				} catch(Exception ex) {
-					logger.warning("Could not load " + file.getName() + " because it's plugin.json does not contain a valid name");
-					continue;
-				}
-
-				String version;
-				try {
-					version = manifest.getString("version");
-					if(version == null) {
-						throw new NullPointerException("version");
-					}
-				} catch(Exception ex) {
-					logger.warning("Could not load " + name + " because it's plugin.json does not contain a valid version");
-					continue;
-				}
-
-				String main;
-				try {
-					main = manifest.getString("main");
-					if(main == null) {
-						throw new NullPointerException("main");
-					}
-				} catch(Exception ex) {
-					logger.warning("Could not load " + name + " because it's plugin.json does not contain a valid main class");
-					continue;
-				}
-
-				List<String> authors = new ArrayList<>();
-				if(manifest.has("authors")) {
-					try {
-						JSONArray array = manifest.getJSONArray("authors");
-						for(int i = 0; i < array.length(); i++) {
-							String author = array.getString(i);
-							if(author != null) {
-								authors.add(author);
-							}
-						}
-					} catch(Exception ex) {
-						logger.warning("Ignoring the list of authors from " + name + " because the JSONArray was invalid");
-					}
-				}
-
-				try {
-					ClassPathLoader.addFile(file);
-				} catch(IOException ex) {
-					logger.info("Invalid plugin.json for " + name + ": Could not load " + file.getName() + " into the classpath");
-					continue;
-				}
-
-				Class<?> plugin;
-				try {
-					plugin = Class.forName(main);
-				} catch(ClassNotFoundException ex) {
-					logger.info("Invalid plugin.json for " + name + ": " + main + " does not exist");
-					continue;
-				}
-
-				if(!BotPlugin.class.isAssignableFrom(plugin)) {
-					logger.info("Invalid plugin.json for " + name + ": " + main + " is not assignable from " + BotPlugin.class.getSimpleName());
-					continue;
-				}
-
-				PluginDescription description = new PluginDescription(name, version, authors);
-				try {
-					BotPlugin loaded = load((Class<BotPlugin>) plugin, description);
-					plugins.add(loaded);
-				} catch(Exception ex) {
-					logger.log("Failed to load " + name + ": ", ex);
-				}
-			}
-		}
+		reload(false);
 
 		File accountsFile = (File) options.valueOf("a");
 		if(!accountsFile.exists()) {
@@ -331,20 +214,140 @@ public class BotHandler {
 	}
 
 	public BotPlugin getPlugin(String name) {
+		return getPlugin(name, true);
+	}
+
+	public BotPlugin getPlugin(String name, boolean sensitive) {
 		for(BotPlugin plugin : plugins) {
-			if(plugin.getDescription().getName().equals(name)) {
+			String pluginName = plugin.getDescription().getName();
+			if(!sensitive) {
+				pluginName = pluginName.toLowerCase();
+				name = name.toLowerCase();
+			}
+
+			if(pluginName.equals(name)) {
 				return plugin;
 			}
 		}
 
 		return null;
 	}
+	
+	public BotPlugin load(File file) {
+		JarFile jar;
+		try {
+			jar = new JarFile(file, true);
+		} catch(IOException ex) {
+			logger.log("Could not load plugin at " + file.getPath() + ": ", ex);
+			return null;
+		}
 
-	public BotPlugin load(Class<BotPlugin> clazz, PluginDescription description) throws Exception {
+		ZipEntry entry = jar.getEntry("plugin.json");
+		String string;
+		try {
+			InputStream stream = jar.getInputStream(entry);
+			string = IOUtils.toString(stream);
+		} catch(IOException ex) {
+			logger.log("Could not load plugin at " + file.getPath() + ": ", ex);
+			return null;
+		}
+
+		JSONObject manifest;
+		try {
+			manifest = new JSONObject(string);
+		} catch(JSONException ex) {
+			logger.log("Could not load " + file.getName() + " because it's plugin.json was not valid: ", ex);
+			return null;
+		}
+
+		String name;
+		try {
+			name = manifest.getString("name");
+			if(name == null) {
+				throw new NullPointerException("name");
+			}
+		} catch(Exception ex) {
+			logger.warning("Could not load " + file.getName() + " because it's plugin.json does not contain a valid name");
+			return null;
+		}
+
+		String version;
+		try {
+			version = manifest.getString("version");
+			if(version == null) {
+				throw new NullPointerException("version");
+			}
+		} catch(Exception ex) {
+			logger.warning("Could not load " + name + " because it's plugin.json does not contain a valid version");
+			return null;
+		}
+
+		String main;
+		try {
+			main = manifest.getString("main");
+			if(main == null) {
+				throw new NullPointerException("main");
+			}
+		} catch(Exception ex) {
+			logger.warning("Could not load " + name + " because it's plugin.json does not contain a valid main class");
+			return null;
+		}
+
+		List<String> authors = new ArrayList<>();
+		if(manifest.has("authors")) {
+			try {
+				JSONArray array = manifest.getJSONArray("authors");
+				for(int i = 0; i < array.length(); i++) {
+					String author = array.getString(i);
+					if(author != null) {
+						authors.add(author);
+					}
+				}
+			} catch(Exception ex) {
+				logger.warning("Ignoring the list of authors from " + name + " because the JSONArray was invalid");
+			}
+		}
+
+		URLClassLoader loader;
+		try {
+			loader = ClassPathLoader.addFile(file);
+		} catch(IOException ex) {
+			logger.info("Invalid plugin.json for " + name + ": Could not load " + file.getName() + " into the classpath");
+			return null;
+		}
+
+		Class<?> plugin;
+		try {
+			plugin = Class.forName(main);
+		} catch(ClassNotFoundException ex) {
+			logger.info("Invalid plugin.json for " + name + ": " + main + " does not exist");
+			return null;
+		}
+
+		if(!BotPlugin.class.isAssignableFrom(plugin)) {
+			logger.info("Invalid plugin.json for " + name + ": " + main + " is not assignable from " + BotPlugin.class.getSimpleName());
+			return null;
+		}
+
+		PluginDescription description = new PluginDescription(name, version, authors);
+		try {
+			BotPlugin loaded = load((Class<BotPlugin>) plugin, description, loader, file);
+			plugins.add(loaded);
+			return loaded;
+		} catch(Exception ex) {
+			logger.log("Failed to load " + name + ": ", ex);
+		}
+
+		return null;
+	}
+
+	public BotPlugin load(Class<BotPlugin> clazz, PluginDescription description, URLClassLoader loader, File file) throws Exception {
 		BotPlugin plugin = clazz.newInstance();
 
 		SimpleObject object = new SimpleObject(plugin, BotPlugin.class);
 		object.field("handler").set(this);
+		object.field("loader").set(loader);
+		object.field("file").set(file);
 		object.field("description").set(description);
 		object.field("logger").set(Logging.getLogger(description.getName(), handler.getLogger()));
 		object.field("dataFolder").set(new File(handler.getPluginsFolder(), description.getName()));
@@ -353,6 +356,64 @@ public class BotHandler {
 
 		plugin.getLogger().info("Loaded " + description.getName() + " v" + description.getVersion());
 		return plugin;
+	}
+
+	public boolean unload(BotPlugin plugin) {
+		plugins.remove(plugin);
+		plugin.setEnabled(false);
+		try {
+			((URLClassLoader) new SimpleObject(plugin, BotPlugin.class).field("loader").value()).close();
+			return true;
+		} catch(Exception ex) {
+			logger.log("Could not unload " + plugin.getDescription().getName() + ": ", ex);
+			return false;
+		}
+	}
+
+	public void reload(BotPlugin plugin) {
+		File file = (File) new SimpleObject(plugin, BotPlugin.class).field("file").value();
+		// unload(plugin);
+		plugin.setEnabled(false);
+		plugin = load(file);
+		if(plugin != null) {
+			plugin.setEnabled(true);
+		}
+	}
+
+	public void reload(boolean enable) {
+		for(BotPlugin plugin : plugins) {
+			plugin.setEnabled(false);
+		}
+
+		plugins = new ArrayList<>();
+
+		if(!pluginsFolder.exists()) {
+			if(pluginsFolder.mkdirs()) {
+				logger.info("Plugins folder did not exist, created one at " + pluginsFolder.getPath());
+			} else {
+				logger.info("Failed to create plugins folder at " + pluginsFolder.getPath());
+				shutdown();
+				return;
+			}
+		}
+
+		if(!pluginsFolder.isDirectory()) {
+			logger.info("The plugins folder, " + pluginsFolder.getPath() + " is a directory");
+			shutdown();
+			return;
+		}
+
+		for(File file : pluginsFolder.listFiles()) {
+			if(file.getName().toLowerCase().endsWith(".jar")) {
+				load(file);
+			}
+		}
+
+		if(enable) {
+			for(BotPlugin plugin : plugins) {
+				plugin.setEnabled(true);
+			}
+		}
 	}
 
 	public void shutdown() {
