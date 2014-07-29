@@ -54,12 +54,12 @@ public class BotHandler {
 		logger = Logging.getLogger().setFormat(format);
 		bots = new HashMap<>();
 		commands = new ArrayList<>();
-		register(new StopCommand());
+		register(new DebugCommand());
+		register(new HelpCommand());
 		register(new PingCommand());
 		register(new PluginsCommand());
-		register(new HelpCommand());
-		register(new DebugCommand());
 		register(new ReloadCommand());
+		register(new StopCommand());
 
 		reload(false);
 
