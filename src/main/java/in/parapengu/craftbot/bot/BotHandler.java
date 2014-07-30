@@ -11,6 +11,7 @@ import in.parapengu.craftbot.command.commands.PingCommand;
 import in.parapengu.craftbot.command.commands.PluginsCommand;
 import in.parapengu.craftbot.command.commands.ReloadCommand;
 import in.parapengu.craftbot.command.commands.StopCommand;
+import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 import in.parapengu.craftbot.plugin.BotPlugin;
@@ -47,6 +48,7 @@ public class BotHandler {
 
 	private File pluginsFolder;
 	private List<BotPlugin> plugins;
+	private EventManager manager;
 
 	public BotHandler(OptionSet options, SimpleDateFormat format) {
 		handler = this;
@@ -55,6 +57,7 @@ public class BotHandler {
 		logger = Logging.getLogger().setFormat(format);
 		bots = new HashMap<>();
 		commands = new ArrayList<>();
+		manager = new EventManager();
 		register(new DebugCommand());
 		register(new HelpCommand());
 		register(new PingCommand());
@@ -435,6 +438,10 @@ public class BotHandler {
 				plugin.setEnabled(true);
 			}
 		}
+	}
+
+	public EventManager getEventManager() {
+		return manager;
 	}
 
 	public void shutdown() {
