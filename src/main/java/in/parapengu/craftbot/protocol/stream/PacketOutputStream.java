@@ -1,12 +1,18 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.NullOutputStream;
+import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
 import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
 import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
+import in.parapengu.craftbot.protocol.Packet;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
 
 public class PacketOutputStream extends DataOutputStream {
@@ -67,6 +73,23 @@ public class PacketOutputStream extends DataOutputStream {
 			write(data);
 		} else {
 			writeShort(-1);
+		}
+	}
+
+	public void sendPacket(Packet packet) {
+		ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
+
+		ByteArrayDataOutput buf = ByteStreams.newDataOutput();
+		try {
+			PacketStream.writeVarInt(buf, packet.getId());
+			packet.send(buf);
+
+			PacketStream.writeVarInt(buffer, buf.toByteArray().length);
+			buffer.write(buf.toByteArray());
+			write(buffer.toByteArray());
+			flush();
+		} catch(Exception ex) {
+			BotHandler.getHandler().getLogger().log("Could not send Packet (" + packet.getClass().getSimpleName() + "):  ", ex);
 		}
 	}
 
