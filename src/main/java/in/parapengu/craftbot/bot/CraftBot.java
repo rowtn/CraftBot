@@ -1,8 +1,10 @@
 package in.parapengu.craftbot.bot;
 
 import in.parapengu.craftbot.event.EventManager;
+import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
+import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import org.json.JSONException;
@@ -77,12 +79,16 @@ public class CraftBot {
 			socket.connect(new InetSocketAddress(address, port), 5000);
 			out = new PacketOutputStream(socket.getOutputStream());
 			in = new PacketInputStream(socket.getInputStream());
-
+			manager.call(new BotConnectServerEvent(this, address, port));
 		} catch(IOException ex) {
 			return ex.getMessage();
 		}
 
 		return null;
+	}
+
+	public void sendPacket(Packet packet) {
+		out.sendPacket(packet);
 	}
 
 }

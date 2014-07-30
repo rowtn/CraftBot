@@ -5,6 +5,7 @@ import in.parapengu.commons.reflection.SimpleObject;
 import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandHandler;
+import in.parapengu.craftbot.command.commands.ConnectCommand;
 import in.parapengu.craftbot.command.commands.DebugCommand;
 import in.parapengu.craftbot.command.commands.HelpCommand;
 import in.parapengu.craftbot.command.commands.PingCommand;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 public class BotHandler {
@@ -58,6 +60,7 @@ public class BotHandler {
 		pluginsFolder = (File) options.valueOf("p");
 		plugins = new ArrayList<>();
 		manager = new EventManager();
+		register(new ConnectCommand());
 		register(new DebugCommand());
 		register(new HelpCommand());
 		register(new PingCommand());
@@ -143,6 +146,31 @@ public class BotHandler {
 
 	public Map<String, CraftBot> getBots() {
 		return bots;
+	}
+
+	public List<CraftBot> getBots(String string) {
+		final String search = string.toLowerCase();
+		List<CraftBot> results = new ArrayList<>();
+		results.addAll(bots.values().stream().filter(bot -> bot.getUsername().equalsIgnoreCase(search)).collect(Collectors.toList()));
+
+		if(results.size() > 1) {
+			return results;
+		}
+
+		results.addAll(bots.values().stream().filter(bot -> bot.getUUID().equalsIgnoreCase(search)).collect(Collectors.toList()));
+
+		if(results.size() > 1) {
+			return results;
+		}
+
+		results.addAll(bots.values().stream().filter(bot -> bot.getUsername().toLowerCase().startsWith(search)).collect(Collectors.toList()));
+
+		if(results.size() > 1) {
+			return results;
+		}
+
+		results.addAll(bots.values().stream().filter(bot -> bot.getUUID().toLowerCase().startsWith(search)).collect(Collectors.toList()));
+		return results;
 	}
 
 	public void register(String username, String password) {
