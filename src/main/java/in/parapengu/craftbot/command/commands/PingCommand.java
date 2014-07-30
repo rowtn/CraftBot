@@ -1,6 +1,5 @@
 package in.parapengu.craftbot.command.commands;
 
-import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandException;
 import in.parapengu.craftbot.command.CommandHandler;
@@ -52,7 +51,7 @@ public class PingCommand extends CommandHandler {
 
 		Map<String, String> result = ServerPinger.ping(address, port);
 		if(result == null) {
-			throw new CommandException("Could not connect to " + address + ":" + port);
+			throw new CommandException("Could not connect to " + address + (port != 25565 ? ":" + port : ""));
 		}
 
 		for(String key : result.keySet()) {

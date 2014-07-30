@@ -52,11 +52,11 @@ public class BotHandler {
 
 	public BotHandler(OptionSet options, SimpleDateFormat format) {
 		handler = this;
-		plugins = new ArrayList<>();
-		pluginsFolder = (File) options.valueOf("p");
 		logger = Logging.getLogger().setFormat(format);
 		bots = new HashMap<>();
 		commands = new ArrayList<>();
+		pluginsFolder = (File) options.valueOf("p");
+		plugins = new ArrayList<>();
 		manager = new EventManager();
 		register(new DebugCommand());
 		register(new HelpCommand());
