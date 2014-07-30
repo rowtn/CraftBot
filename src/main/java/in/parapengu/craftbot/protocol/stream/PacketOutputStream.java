@@ -77,14 +77,13 @@ public class PacketOutputStream extends DataOutputStream {
 	}
 
 	public void sendPacket(Packet packet) {
-		ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
-
-		ByteArrayDataOutput buf = ByteStreams.newDataOutput();
+		PacketOutputArray buffer = new PacketOutputArray();
+		PacketOutputArray buf = new PacketOutputArray();
 		try {
-			PacketStream.writeVarInt(buf, packet.getId());
+			buf.writeVarInt(packet.getId());
 			packet.send(buf);
 
-			PacketStream.writeVarInt(buffer, buf.toByteArray().length);
+			buffer.writeVarInt(buf.toByteArray().length);
 			buffer.write(buf.toByteArray());
 			write(buffer.toByteArray());
 			flush();
