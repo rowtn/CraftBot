@@ -7,12 +7,13 @@ import in.parapengu.craftbot.logging.Logging;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
+import in.parapengu.craftbot.protocol.v4.ProtocolV4;
+import in.parapengu.craftbot.server.ServerPinger;
 import org.json.JSONException;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Map;
 
 public class CraftBot {
 
@@ -26,8 +27,8 @@ public class CraftBot {
 	private String accessToken;
 
 	private Socket socket;
-	private PacketOutputStream out;
-	private PacketInputStream in;
+	private PacketOutputStream output;
+	private PacketInputStream input;
 
 	public CraftBot(String account, String password) throws IOException, JSONException {
 		authenticator = new BotAuthenticator(account, password);
@@ -73,22 +74,49 @@ public class CraftBot {
 		return accessToken;
 	}
 
-	public String connect(String address, int port) {
-		socket = new Socket();
-		try {
-			socket.connect(new InetSocketAddress(address, port), 5000);
-			out = new PacketOutputStream(socket.getOutputStream());
-			in = new PacketInputStream(socket.getInputStream());
-			manager.call(new BotConnectServerEvent(this, address, port));
-		} catch(IOException ex) {
-			return ex.getMessage();
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public void setSocket(Socket socket) {
+		this.socket = socket;
+	}
+
+	public PacketOutputStream getOutput() {
+		return output;
+	}
+
+	public void setOutput(PacketOutputStream output) {
+		this.output = output;
+	}
+
+	public PacketInputStream getInput() {
+		return input;
+	}
+
+	public void setInput(PacketInputStream input) {
+		this.input = input;
+	}
+
+	public void connect(String address, int port) {
+		Map<String, String> ping = ServerPinger.ping(address, port);
+		if(ping == null) {
+			logger.warning("Could not connect to ...");
+			return;
 		}
 
-		return null;
+		if(ping.get("protocol").equals("4")) {
+			manager.register(new ProtocolV4());
+		} else {
+			logger.warning("Unsupported Protocol version \"" + ping.get("protocol") + "\"");
+			return;
+		}
+
+		manager.call(new BotConnectServerEvent(this, address, port));
 	}
 
 	public void sendPacket(Packet packet) {
-		out.sendPacket(packet);
+		output.sendPacket(packet);
 	}
 
 }

@@ -70,6 +70,10 @@ public class ConnectCommand extends CommandHandler {
 		List<String> names = bots.stream().map(CraftBot::getUsername).collect(Collectors.toList());
 		String connecting = "Connecting " + OtherUtil.listToEnglishCompound(names) + " to " + address + (port != 25565 ? ":" + port : "");
 		sender.info(connecting);
+
+		for(CraftBot bot : bots) {
+			bot.connect(address, port);
+		}
 		return true;
 	}
 

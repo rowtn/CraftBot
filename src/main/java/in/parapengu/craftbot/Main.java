@@ -28,6 +28,7 @@ public class Main {
 		OptionParser parser = new OptionParser();
 		parser.acceptsAll(asList("h", "help"), "Show this help dialog.").forHelp();
 		OptionSpec<Boolean> logAppend = parser.acceptsAll(asList("log-append"), "Whether to append to the log file").withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
+		OptionSpec<Boolean> debug = parser.acceptsAll(asList("debug"), "Whether to enable debug mode").withRequiredArg().ofType(Boolean.class).defaultsTo(false).describedAs("Debug mode");
 		OptionSpec<File> logFile = parser.acceptsAll(asList("log-file", "log"), "Specifies the log file name").withRequiredArg().ofType(File.class).defaultsTo(new File("output.log")).describedAs("Log filename");
 		OptionSpec<SimpleDateFormat> dateFormat = parser.acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)").withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
 		OptionSpec<File> accountsFile = parser.acceptsAll(asList("a", "accounts"), "Specifies the accounts file").withRequiredArg().ofType(File.class).defaultsTo(new File("accounts.json")).describedAs("Accounts filename");
