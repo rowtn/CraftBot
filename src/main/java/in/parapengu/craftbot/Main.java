@@ -2,6 +2,7 @@ package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
 import in.parapengu.craftbot.bot.BotHandler;
+import in.parapengu.craftbot.logging.Logging;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.completer.CompletionHandler;
@@ -25,7 +26,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		OptionParser parser = new OptionParser();
-		parser.acceptsAll(asList("h", "help"), "Show this help dialog.");
+		parser.acceptsAll(asList("h", "help"), "Show this help dialog.").forHelp();
 		OptionSpec<Boolean> logAppend = parser.acceptsAll(asList("log-append"), "Whether to append to the log file").withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
 		OptionSpec<File> logFile = parser.acceptsAll(asList("log-file", "log"), "Specifies the log file name").withRequiredArg().ofType(File.class).defaultsTo(new File("output.log")).describedAs("Log filename");
 		OptionSpec<SimpleDateFormat> dateFormat = parser.acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)").withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
@@ -37,6 +38,16 @@ public class Main {
 			options = parser.parse(args);
 		} catch(OptionException ex) {
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
+			return;
+		}
+
+		if(options.has("h")) {
+			try {
+				parser.printHelpOn(System.out);
+			} catch(IOException ex) {
+				Logging.getLogger().log("Could not display help: ", ex);
+			}
+
 			return;
 		}
 
