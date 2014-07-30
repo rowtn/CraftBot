@@ -42,6 +42,7 @@ public class BotHandler {
 	private Logger logger;
 	private Map<String, CraftBot> bots;
 
+	private int loaded = 0;
 	private List<CommandHandler> commands;
 
 	private File pluginsFolder;
@@ -61,6 +62,7 @@ public class BotHandler {
 		register(new ReloadCommand());
 		register(new StopCommand());
 
+		long start = System.currentTimeMillis();
 		reload(false);
 
 		File accountsFile = (File) options.valueOf("a");
@@ -96,25 +98,36 @@ public class BotHandler {
 
 		JSONArray accounts = new JSONArray(builder.toString());
 		for(int i = 0; i < accounts.length(); i++) {
-			JSONObject object = accounts.getJSONObject(i);
-			String username;
-			String password;
-			try {
-				username = object.getString("username");
-				password = object.getString("password");
-			} catch(JSONException ex) {
-				logger.info("Error while parsing " + accountsFile.toPath() + ": " + ex.getMessage());
-				continue;
-			}
+			final JSONObject object = accounts.getJSONObject(i);
+			new Thread(() -> {
+				String username;
+				String password;
+				try {
+					username = object.getString("username");
+					password = object.getString("password");
+				} catch(JSONException ex) {
+					logger.info("Error while parsing " + accountsFile.toPath() + ": " + ex.getMessage());
+					loaded++;
+					return;
+				}
 
-			register(username, password);
+				register(username, password);
+				loaded++;
+			}).start();
 		}
 
+		while(accounts.length() > loaded) {
+			logger.debug("Loaded " + loaded + " out of " + accounts.length() + " bots");
+		}
 		logger.info("Loaded " + bots.size() + " account" + (bots.size() != 0 ? "s" : ""));
 
 		for(BotPlugin plugin : plugins) {
 			plugin.setEnabled(true);
 		}
+
+		long finish = System.currentTimeMillis();
+		double seconds = (double) (finish - start) / 1000;
+		logger.info("Done (" + seconds + "s)! For help, type \"help\" or \"?\"");
 	}
 
 	public static BotHandler getHandler() {
