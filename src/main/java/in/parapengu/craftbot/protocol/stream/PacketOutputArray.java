@@ -2,7 +2,6 @@ package in.parapengu.craftbot.protocol.stream;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import in.parapengu.craftbot.bot.BotHandler;
 import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.IOException;
@@ -25,12 +24,12 @@ public class PacketOutputArray extends PacketOutputStream {
 	public void write(int b) throws IOException {
 		super.write(b);
 		output.write(b);
-		BotHandler.getHandler().getLogger().debug("Writing " + b + " to the byte list: " + toByteList());
+		// BotHandler.getHandler().getLogger().debug("Writing " + b + " to the byte list: " + toByteList());
 	}
 
 	public List<Byte> toByteList() {
 		List<Byte> bytes = new ArrayList<>();
-		for(byte b : output.toByteArray()) {
+		for(byte b : toByteArray()) {
 			bytes.add(b);
 		}
 		return bytes;

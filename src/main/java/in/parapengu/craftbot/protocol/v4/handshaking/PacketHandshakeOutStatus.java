@@ -14,14 +14,14 @@ public class PacketHandshakeOutStatus extends Packet {
 
 	private int protocol;
 	private String address;
-	private short port;
+	private int port;
 	private State state;
 
 	public PacketHandshakeOutStatus(int protocol, String address, int port, State state) {
 		super(0x00);
 		this.protocol = protocol;
 		this.address = address;
-		this.port = (short) port;
+		this.port = port;
 		this.state = state;
 	}
 

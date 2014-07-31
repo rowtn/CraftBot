@@ -8,6 +8,7 @@ import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.State;
 import in.parapengu.craftbot.protocol.stream.GlobalPacketStream;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
+import in.parapengu.craftbot.protocol.stream.PacketOutputArray;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import in.parapengu.craftbot.protocol.stream.PacketStream;
 import in.parapengu.craftbot.protocol.v4.handshaking.PacketHandshakeOutStatus;
@@ -93,10 +94,22 @@ public class ServerPinger {
 			};
 			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Created Packet stream)");
 
-			stream.sendPacket(new PacketHandshakeOutStatus(4, server, port, State.STATUS));
-			stream.sendPacket(new PacketStatusOutRequest());
-			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Sent packets)");
+			PacketOutputStream buf = new PacketOutputStream(new PacketOutputArray());
+			buf.writeVarInt(0);
+			buf.writeVarInt(4);
+			buf.writeString(server);
+			buf.writeShort(port);
+			buf.writeVarInt(1);
+			stream.sendPacket(buf);
+
+			buf = new PacketOutputStream(new PacketOutputArray());
+			buf.writeVarInt(0);
+			stream.sendPacket(buf);
 			stream.start();
+
+			// stream.sendPacket(new PacketHandshakeOutStatus(4, server, port, State.STATUS));
+			// stream.sendPacket(new PacketStatusOutRequest());
+			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Sent packets)");
 			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Started stream)");
 			return map;
 		} catch(Exception e) {

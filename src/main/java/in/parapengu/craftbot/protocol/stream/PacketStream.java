@@ -1,5 +1,6 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.event.packet.ReceivePacketEvent;
 import in.parapengu.craftbot.event.packet.SendPacketEvent;
@@ -47,14 +48,23 @@ public abstract class PacketStream {
 		this.input = input;
 	}
 
+	public void sendPacket(PacketOutputStream packet) throws IOException {
+		output.sendPacket(packet);
+		getLogger().debug("Sent Packet: " + packet.toString());
+	}
+
 	public void sendPacket(Packet packet) {
 		SendPacketEvent event = getManager().call(new SendPacketEvent(packet));
 		if(event.isCancelled()) {
 			return;
 		}
 
-		getLogger().debug("Sent Packet: " + packet.toString());
-		output.sendPacket(packet);
+		try {
+			output.sendPacket(packet);
+			getLogger().debug("Sent Packet: " + packet.toString());
+		} catch(IOException ex) {
+			BotHandler.getHandler().getLogger().log("Could not send Packet (" + packet.getClass().getSimpleName() + "):  ", ex);
+		}
 	}
 
 	public abstract Logger getLogger();
@@ -64,7 +74,6 @@ public abstract class PacketStream {
 	public PacketStream start() {
 		while(input != null && socket.isConnected()) {
 			try {
-				getLogger().debug("Loooooooooping around!");
 				int length = input.readVarInt();
 				getLogger().debug("Read length: " + length);
 				int id = input.readVarInt();

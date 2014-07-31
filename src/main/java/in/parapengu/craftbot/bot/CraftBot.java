@@ -127,8 +127,4 @@ public class CraftBot {
 		manager.call(new BotConnectServerEvent(this, address, port));
 	}
 
-	public void sendPacket(Packet packet) {
-		output.sendPacket(packet);
-	}
-
 }

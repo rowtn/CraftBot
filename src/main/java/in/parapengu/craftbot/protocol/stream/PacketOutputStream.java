@@ -1,5 +1,7 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import in.parapengu.commons.utils.OtherUtil;
 import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
@@ -75,34 +77,27 @@ public class PacketOutputStream extends DataOutputStream {
 		}
 	}
 
-	public void sendPacket(Packet packet) {
-		PacketOutputStream buffer = new PacketOutputStream(new PacketOutputArray());
-		PacketOutputStream buf = new PacketOutputStream(new PacketOutputArray());
-		try {
-			buf.writeVarInt(packet.getId());
-			BotHandler.getHandler().getLogger().debug("Wrote packet id (" + packet.getId() + ")");
-			packet.send(buf);
-			BotHandler.getHandler().getLogger().debug("Wrote packet data (" + packet + ")");
+	public void sendPacket(Packet packet) throws IOException {
+		PacketOutputStream data = new PacketOutputStream(new PacketOutputArray());
+		data.writeVarInt(packet.getId()); // write the packet id
+		packet.send(data); // write the packet data
+		sendPacket(data);
+	}
 
-			PacketOutputArray bufOut = (PacketOutputArray) buf.out;
-			PacketOutputArray bufferOut = (PacketOutputArray) buf.out;
-			if(bufOut.toByteArray().length > 1) {
-				buffer.writeVarInt(bufOut.toByteArray().length);
-				BotHandler.getHandler().getLogger().debug("Wrote buffer array length (" + bufOut.toByteArray().length + ")");
-			}
-			buffer.write(bufOut.toByteArray());
-			byte[] array = bufferOut.toByteArray();
-			List<Byte> list = new ArrayList<>();
-			for(byte b : array) {
-				list.add(b);
-			}
-			BotHandler.getHandler().getLogger().debug("Wrote buffer array contents (" + list + ")");
-			write(array);
-			flush();
-			BotHandler.getHandler().getLogger().debug("Wrote out bytes for " + packet.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
-		} catch(Exception ex) {
-			BotHandler.getHandler().getLogger().log("Could not send Packet (" + packet.getClass().getSimpleName() + "):  ", ex);
+	public void sendPacket(PacketOutputStream data) throws IOException {
+		PacketOutputStream send = new PacketOutputStream(new PacketOutputArray()); // create a new final byte array
+		PacketOutputArray dataBuf = (PacketOutputArray) data.out;
+		PacketOutputArray sendBuf = (PacketOutputArray) send.out;
+
+		send.writeVarInt(dataBuf.toByteArray().length); // write the length of the buffer
+		for(byte b : dataBuf.toByteArray()) {
+			send.write(b); // write the array of bytes to the final byte array
 		}
+		write(sendBuf.toByteArray()); // write the final array to the data output stream
+		flush(); // flush the output and send it on it's way
+
+		List<Byte> list = sendBuf.toByteList();
+		BotHandler.getHandler().getLogger().debug("Wrote out bytes for " + data.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
 	}
 
 }
