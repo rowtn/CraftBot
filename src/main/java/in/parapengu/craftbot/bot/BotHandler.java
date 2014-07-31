@@ -153,20 +153,17 @@ public class BotHandler {
 		final String search = string.toLowerCase();
 		List<CraftBot> results = new ArrayList<>();
 		results.addAll(bots.values().stream().filter(bot -> bot.getUsername().equalsIgnoreCase(search)).collect(Collectors.toList()));
-
-		if(results.size() > 1) {
+		if(results.size() > 0) {
 			return results;
 		}
 
 		results.addAll(bots.values().stream().filter(bot -> bot.getUUID().equalsIgnoreCase(search)).collect(Collectors.toList()));
-
-		if(results.size() > 1) {
+		if(results.size() > 0) {
 			return results;
 		}
 
 		results.addAll(bots.values().stream().filter(bot -> bot.getUsername().toLowerCase().startsWith(search)).collect(Collectors.toList()));
-
-		if(results.size() > 1) {
+		if(results.size() > 0) {
 			return results;
 		}
 

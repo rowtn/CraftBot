@@ -1,6 +1,5 @@
 package in.parapengu.craftbot.protocol.stream;
 
-import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
 import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
 import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
@@ -9,6 +8,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PacketInputStream extends DataInputStream {
 
@@ -93,6 +94,43 @@ public class PacketInputStream extends DataInputStream {
 			return CompressedStreamTools.decompress(data);
 		} else
 			return null;
+	}
+
+	public Map<Integer, DataObject<?>> readDataObjects() throws IOException {
+		Map<Integer, DataObject<?>> map = new HashMap<>();
+		for(byte b = readByte(); b != 127; b = readByte()) {
+			int i = (b & 0xe0) >> 5;
+			int j = b & 0x1f;
+			DataObject<?> data = null;
+			switch(i) {
+				case 0:
+					data = new DataObject<>(i, j, readByte());
+					break;
+				case 1:
+					data = new DataObject<>(i, j, readShort());
+					break;
+				case 2:
+					data = new DataObject<>(i, j, readInt());
+					break;
+				case 3:
+					data = new DataObject<>(i, j, readFloat());
+					break;
+				case 4:
+					data = new DataObject<>(i, j, readString());
+					break;
+				case 5:
+					data = new DataObject<>(i, j, readItemStack());
+					break;
+				case 6:
+					int k = readInt(); // x
+					int l = readInt(); // y
+					int i1 = readInt(); // z
+					// watchableobject = new DataObject<>(i, j, new BlockLocation(k, l, i1));
+					break;
+			}
+			map.put(i, data);
+		}
+		return map;
 	}
 
 }

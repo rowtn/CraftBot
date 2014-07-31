@@ -76,6 +76,39 @@ public class PacketOutputStream extends DataOutputStream {
 		}
 	}
 
+	public void writeDataObject(DataOutputStream out, DataObject<?> dataObject) throws IOException {
+		int i = (dataObject.getObjectType() << 5 | dataObject.getDataValueId() & 0x1f) & 0xff;
+		out.writeByte(i);
+
+		switch(dataObject.getObjectType()) {
+			case 0:
+				out.writeByte(((Byte) dataObject.getObject()).byteValue());
+				break;
+			case 1:
+				out.writeShort(((Short) dataObject.getObject()).shortValue());
+				break;
+			case 2:
+				out.writeInt(((Integer) dataObject.getObject()).intValue());
+				break;
+			case 3:
+				out.writeFloat(((Float) dataObject.getObject()).floatValue());
+				break;
+			case 4:
+				writeString((String) dataObject.getObject());
+				break;
+			case 5:
+				ItemStack itemstack = (ItemStack) dataObject.getObject();
+				writeItemStack(itemstack);
+				break;
+			case 6:
+				// BlockLocation chunkcoordinates = (BlockLocation) dataObject.getObject();
+				// out.writeInt(chunkcoordinates.getX());
+				// out.writeInt(chunkcoordinates.getY());
+				// out.writeInt(chunkcoordinates.getZ());
+				break;
+		}
+	}
+
 	public void sendPacket(Packet packet) throws IOException {
 		PacketOutputStream data = new PacketOutputStream(new ByteArrayOutputStream());
 		data.writeVarInt(packet.getId()); // write the packet id

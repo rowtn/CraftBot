@@ -46,8 +46,20 @@ public class ConnectCommand extends CommandHandler {
 		if(context.getArguments().length == 1) {
 			bots.addAll(handler.getBots().values());
 		} else {
-			for(String name : context.getArguments()) {
-				bots.addAll(handler.getBots(name));
+			List<String> args = new ArrayList<>();
+			for(String arg : context.getArguments()) {
+				args.add(arg);
+			}
+			args = args.subList(1, context.getArguments().length);
+			sender.info(args);
+
+			for(String name : args) {
+				List<CraftBot> list = handler.getBots(name);
+				for(CraftBot bot : list) {
+					if(bot != null && !bots.contains(bot)) {
+						bots.add(bot);
+					}
+				}
 			}
 		}
 

@@ -30,6 +30,7 @@ import in.parapengu.craftbot.protocol.v4.play.PacketPlayInJoinGame;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInKeepAlive;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInPlayerPosition;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInRespawn;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPlayer;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPosition;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInTimeUpdate;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUpdateHealth;
@@ -76,6 +77,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 		login.put(0x09, PacketPlayInHeldItemChange.class);
 		login.put(0x0A, PacketPlayInUseBed.class);
 		login.put(0x0B, PacketPlayInAnimation.class);
+		login.put(0x0C, PacketPlayInSpawnPlayer.class);
 		packets.put(State.PLAY, play);
 	}
 
@@ -111,6 +113,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 	@EventHandler
 	public void onPacket(ReceivePacketEvent event) {
 		if(event.getPacket() instanceof PacketLoginInEncryptionRequest) {
+			bot.getLogger().info("Attempting to authenticate!");
 			PacketLoginInEncryptionRequest request = (PacketLoginInEncryptionRequest) event.getPacket();
 			String serverId = request.getServer().trim();
 			PublicKey publicKey;
