@@ -1,7 +1,5 @@
 package in.parapengu.craftbot.protocol.stream;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import in.parapengu.commons.utils.OtherUtil;
 import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
@@ -9,6 +7,7 @@ import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
 import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
 import in.parapengu.craftbot.protocol.Packet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +25,7 @@ public class PacketOutputStream extends DataOutputStream {
 
 	public void writeString(String string) throws IOException {
 		writeVarInt(string.length());
-		write(string.getBytes(UTF8));
+		write(string.getBytes("UTF-8"));
 	}
 
 	public void writeVarInt(int paramInt) throws IOException {
@@ -78,16 +77,16 @@ public class PacketOutputStream extends DataOutputStream {
 	}
 
 	public void sendPacket(Packet packet) throws IOException {
-		PacketOutputStream data = new PacketOutputStream(new PacketOutputArray());
+		PacketOutputStream data = new PacketOutputStream(new ByteArrayOutputStream());
 		data.writeVarInt(packet.getId()); // write the packet id
 		packet.send(data); // write the packet data
 		sendPacket(data);
 	}
 
 	public void sendPacket(PacketOutputStream data) throws IOException {
-		PacketOutputStream send = new PacketOutputStream(new PacketOutputArray()); // create a new final byte array
-		PacketOutputArray dataBuf = (PacketOutputArray) data.out;
-		PacketOutputArray sendBuf = (PacketOutputArray) send.out;
+		PacketOutputStream send = new PacketOutputStream(new ByteArrayOutputStream()); // create a new final byte array
+		ByteArrayOutputStream dataBuf = (ByteArrayOutputStream) data.out;
+		ByteArrayOutputStream sendBuf = (ByteArrayOutputStream) send.out;
 
 		send.writeVarInt(dataBuf.toByteArray().length); // write the length of the buffer
 		for(byte b : dataBuf.toByteArray()) {
@@ -96,7 +95,10 @@ public class PacketOutputStream extends DataOutputStream {
 		write(sendBuf.toByteArray()); // write the final array to the data output stream
 		flush(); // flush the output and send it on it's way
 
-		List<Byte> list = sendBuf.toByteList();
+		List<Byte> list = new ArrayList<>();
+		for(byte b : sendBuf.toByteArray()) {
+			list.add(b);
+		}
 		BotHandler.getHandler().getLogger().debug("Wrote out bytes for " + data.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
 	}
 

@@ -30,7 +30,8 @@ public class PacketInputStream extends DataInputStream {
 		int j = 0;
 		while(true) {
 			int k = read();
-			BotHandler.getHandler().getLogger().debug("Read " + k);
+			if(k == -1)
+				throw new IOException("End of stream");
 
 			i |= (k & 0x7F) << j++ * 7;
 

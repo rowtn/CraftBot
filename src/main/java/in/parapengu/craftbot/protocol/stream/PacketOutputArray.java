@@ -1,9 +1,6 @@
 package in.parapengu.craftbot.protocol.stream;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import org.apache.commons.io.output.NullOutputStream;
-
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -13,11 +10,11 @@ public class PacketOutputArray extends PacketOutputStream {
 
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
-	private ByteArrayDataOutput output;
+	private ByteArrayOutputStream output;
 
 	public PacketOutputArray() {
-		super(new NullOutputStream());
-		this.output = ByteStreams.newDataOutput();
+		super(new ByteArrayOutputStream());
+		this.output = new ByteArrayOutputStream();
 	}
 
 	@Override

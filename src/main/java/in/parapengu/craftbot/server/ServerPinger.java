@@ -55,7 +55,6 @@ public class ServerPinger {
 			PacketOutputStream out = new PacketOutputStream(socket.getOutputStream());
 			PacketInputStream in = new PacketInputStream(socket.getInputStream());
 
-			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Created streams)");
 			GlobalPacketStream stream = new GlobalPacketStream(packets, socket, out, in) {
 
 				@Override
@@ -92,28 +91,13 @@ public class ServerPinger {
 				}
 
 			};
-			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Created Packet stream)");
 
-			PacketOutputStream buf = new PacketOutputStream(new PacketOutputArray());
-			buf.writeVarInt(0);
-			buf.writeVarInt(4);
-			buf.writeString(server);
-			buf.writeShort(port);
-			buf.writeVarInt(1);
-			stream.sendPacket(buf);
-
-			buf = new PacketOutputStream(new PacketOutputArray());
-			buf.writeVarInt(0);
-			stream.sendPacket(buf);
+			stream.sendPacket(new PacketHandshakeOutStatus(4, server, port, State.STATUS));
+			stream.sendPacket(new PacketStatusOutRequest());
 			stream.start();
-
-			// stream.sendPacket(new PacketHandshakeOutStatus(4, server, port, State.STATUS));
-			// stream.sendPacket(new PacketStatusOutRequest());
-			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Sent packets)");
-			BotHandler.getHandler().getLogger().info("Time " + ping + "s (Started stream)");
 			return map;
-		} catch(Exception e) {
-			// nothing
+		} catch(Exception ex) {
+			// BotHandler.getHandler().getLogger().log("Something happened?! ", ex);
 		}
 
 		return null;
