@@ -45,6 +45,16 @@ public class BotPacketStream extends PacketStream {
 	}
 
 	@Override
+	public boolean validate(int id) {
+		if(id > protocol.getMaxPacketId(getState())) {
+			getLogger().debug("Invalid packet #" + id + ": Too high!");
+			return false;
+		}
+
+		return super.validate(id);
+	}
+
+	@Override
 	public BotPacketStream start() {
 		super.start();
 		return this;

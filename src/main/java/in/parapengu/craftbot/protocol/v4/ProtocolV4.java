@@ -24,17 +24,21 @@ import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutEncryptionResponse;
 import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutStart;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInAnimation;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInChatMessage;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInCollectItem;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityEquiptment;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInHeldItemChange;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInJoinGame;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInKeepAlive;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInPlayerPosition;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInRespawn;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnMob;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnObject;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPlayer;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPosition;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInTimeUpdate;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUpdateHealth;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUseBed;
+import in.parapengu.craftbot.util.ClassUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -57,33 +61,40 @@ public class ProtocolV4 extends Protocol implements Listener {
 		super(4, "1.7.2", "1.7.5");
 
 		packets = new HashMap<>();
+		maxIds = new HashMap<>();
 
 		Map<Integer, Class<? extends Packet>> login = new HashMap<>();
 		login.put(0x00, PacketLoginInDisconnect.class);
 		login.put(0x01, PacketLoginInEncryptionRequest.class);
 		login.put(0x02, PacketLoginInSuccess.class);
 		packets.put(State.LOGIN, login);
+		maxIds.put(State.LOGIN, 0x02);
 
 		Map<Integer, Class<? extends Packet>> play = new HashMap<>();
-		login.put(0x00, PacketPlayInKeepAlive.class);
-		login.put(0x01, PacketPlayInJoinGame.class);
-		login.put(0x02, PacketPlayInChatMessage.class);
-		login.put(0x03, PacketPlayInTimeUpdate.class);
-		login.put(0x04, PacketPlayInEntityEquiptment.class);
-		login.put(0x05, PacketPlayInSpawnPosition.class);
-		login.put(0x06, PacketPlayInUpdateHealth.class);
-		login.put(0x07, PacketPlayInRespawn.class);
-		login.put(0x08, PacketPlayInPlayerPosition.class);
-		login.put(0x09, PacketPlayInHeldItemChange.class);
-		login.put(0x0A, PacketPlayInUseBed.class);
-		login.put(0x0B, PacketPlayInAnimation.class);
-		login.put(0x0C, PacketPlayInSpawnPlayer.class);
+		play.put(0x00, PacketPlayInKeepAlive.class);
+		play.put(0x01, PacketPlayInJoinGame.class);
+		play.put(0x02, PacketPlayInChatMessage.class);
+		play.put(0x03, PacketPlayInTimeUpdate.class);
+		play.put(0x04, PacketPlayInEntityEquiptment.class);
+		play.put(0x05, PacketPlayInSpawnPosition.class);
+		play.put(0x06, PacketPlayInUpdateHealth.class);
+		play.put(0x07, PacketPlayInRespawn.class);
+		play.put(0x08, PacketPlayInPlayerPosition.class);
+		play.put(0x09, PacketPlayInHeldItemChange.class);
+		play.put(0x0A, PacketPlayInUseBed.class);
+		play.put(0x0B, PacketPlayInAnimation.class);
+		play.put(0x0C, PacketPlayInSpawnPlayer.class);
+		play.put(0x0D, PacketPlayInCollectItem.class);
+		play.put(0x0E, PacketPlayInSpawnObject.class);
+		play.put(0x0F, PacketPlayInSpawnMob.class);
 		packets.put(State.PLAY, play);
+		maxIds.put(State.PLAY, 0x40);
 	}
 
 	@EventHandler
 	public void onConnect(BotConnectServerEvent event) {
 		event.getBot().getLogger().info("Testing connection to " + event.getAddress() + ":" + event.getPort());
+		event.getBot().getLogger().debug("Loaded Packets: " + packets);
 
 		bot = event.getBot();
 		String address = event.getAddress();
@@ -91,7 +102,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 
 		try {
 			socket = new Socket();
-			socket.connect(new InetSocketAddress(address, port), 5000);
+			socket.connect(new InetSocketAddress(address, port), 20*1000);
 			output = new PacketOutputStream(socket.getOutputStream());
 			input = new PacketInputStream(socket.getInputStream());
 			bot.setSocket(socket);
@@ -142,11 +153,17 @@ public class ProtocolV4 extends Protocol implements Listener {
 					stream.close();
 				}
 			}
-			stream.sendPacket(new PacketLoginOutEncryptionResponse(request.getKey(), request.getToken()));
+
+			stream.sendPacket(new PacketLoginOutEncryptionResponse(secretKey, publicKey, request.getToken()));
 		} else if(event.getPacket() instanceof PacketLoginInSuccess) {
 			bot.getLogger().info("Logged in successfully!");
 			bot.setState(State.PLAY);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return ClassUtils.build(getClass(), this, true);
 	}
 
 }

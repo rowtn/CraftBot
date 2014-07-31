@@ -71,6 +71,18 @@ public abstract class PacketStream {
 
 	public abstract EventManager getManager();
 
+	public boolean validate(int id) {
+		getLogger().debug("Attempting to find a " + getState().name() + " packet with the id #" + id);
+		Class<? extends Packet> clazz = packets.get(getState()).get(id);
+		if(clazz == null) {
+			getLogger().severe("Could not find packet with id #" + id);
+			close();
+			return false;
+		}
+
+		return true;
+	}
+
 	public PacketStream start() {
 		while(input != null && socket.isConnected()) {
 			try {
@@ -78,24 +90,22 @@ public abstract class PacketStream {
 				getLogger().debug("Read length: " + length);
 				int id = input.readVarInt();
 				getLogger().debug("Read id: " + id);
-
-				Class<? extends Packet> clazz = packets.get(getState()).get(id);
-				if(clazz == null) {
-					getLogger().severe("Could not find packet with id #" + id);
-					close();
+				if(!validate(id)) {
 					break;
 				}
 
+				Class<? extends Packet> clazz = packets.get(getState()).get(id);
 				Packet packet = clazz.newInstance();
 				getLogger().debug("Created new " + clazz.getSimpleName());
 				packet.build(input);
 				handle(packet);
 			} catch(Exception ex) {
 				getLogger().log("Packet error! ", ex);
-				close();
+				break;
 			}
 		}
 
+		close();
 		return this;
 	}
 
@@ -104,6 +114,7 @@ public abstract class PacketStream {
 	}
 
 	public void close() {
+		getLogger().warning("Closing connection with " + socket.getInetAddress().getHostAddress());
 		try {
 			output.close();
 			input.close();

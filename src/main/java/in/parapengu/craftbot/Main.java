@@ -2,10 +2,10 @@ package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
 import in.parapengu.craftbot.bot.BotHandler;
+import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
-import jline.console.completer.CompletionHandler;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -17,8 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Main {
 
@@ -38,7 +36,7 @@ public class Main {
 		try {
 			options = parser.parse(args);
 		} catch(OptionException ex) {
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
+			Logging.getLogger(Main.class.getName()).severe(ex.getLocalizedMessage());
 			return;
 		}
 
@@ -95,7 +93,7 @@ public class Main {
 				bot.getLogger().info(candidates);
 				return false;
 			});
-			String line = null;
+			String line;
 			while((line = console.readLine()) != null) {
 				bot.command(line.split(" "));
 			}

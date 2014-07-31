@@ -1,6 +1,8 @@
 package in.parapengu.craftbot.logging;
 
 import in.parapengu.craftbot.bot.ChatColor;
+import in.parapengu.craftbot.util.ClassUtils;
+import jline.console.ConsoleReader;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -84,7 +86,7 @@ public class Logger {
 	}
 
 	public Logger log(LogLevel level, Object pre, Object... messages) {
-		if(level == DEBUG && !debug) {
+		if(level == DEBUG && !isDebug()) {
 			return this;
 		}
 
@@ -151,6 +153,11 @@ public class Logger {
 	public Logger log(Exception... exceptions) {
 		log(SEVERE, "", exceptions);
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return ClassUtils.build(getClass(), this, true);
 	}
 
 }

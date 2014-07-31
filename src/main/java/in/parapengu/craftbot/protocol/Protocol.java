@@ -10,6 +10,8 @@ import java.util.Map;
 public class Protocol implements Listener {
 
 	protected Map<State, Map<Integer, Class<? extends Packet>>> packets;
+	protected Map<State, Integer> maxIds;
+
 	private int version;
 	private String startingVersion;
 	private String endingVersion;
@@ -26,6 +28,14 @@ public class Protocol implements Listener {
 
 	public Map<State, Map<Integer, Class<? extends Packet>>> getPackets() {
 		return packets;
+	}
+
+	public Map<State, Integer> getMaxIds() {
+		return maxIds;
+	}
+
+	public int getMaxPacketId(State state) {
+		return maxIds.get(state);
 	}
 
 	public int getVersion() {

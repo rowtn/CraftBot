@@ -86,7 +86,7 @@ public class ServerPinger {
 					map.put("players", players.getInt("online") + "");
 					map.put("max-players", players.getInt("max") + "");
 					map.put("socket-ping", ping + "s");
-					sendPacket(new PacketStatusOutTime(0L));
+					sendPacket(new PacketStatusOutTime(System.currentTimeMillis()));
 					close();
 				}
 

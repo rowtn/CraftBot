@@ -54,7 +54,7 @@ public class BotHandler {
 
 	public BotHandler(OptionSet options, SimpleDateFormat format) {
 		handler = this;
-		logger = Logging.getLogger().setFormat(format);
+		logger = Logging.getLogger(BotHandler.class).setFormat(format);
 		logger.setDebug((boolean) options.valueOf("debug"));
 		bots = new HashMap<>();
 		commands = new ArrayList<>();

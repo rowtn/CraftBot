@@ -2,6 +2,7 @@ package in.parapengu.craftbot.protocol;
 
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
+import in.parapengu.craftbot.util.ClassUtils;
 
 import java.io.IOException;
 
@@ -29,5 +30,10 @@ public abstract class Packet {
 	public abstract void build(PacketInputStream input) throws IOException;
 
 	public abstract void send(PacketOutputStream buffer) throws IOException;
+
+	@Override
+	public String toString() {
+		return ClassUtils.build(getClass(), this, true);
+	}
 
 }
