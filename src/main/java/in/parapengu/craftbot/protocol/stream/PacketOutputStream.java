@@ -80,20 +80,26 @@ public class PacketOutputStream extends DataOutputStream {
 		PacketOutputStream buf = new PacketOutputStream(new PacketOutputArray());
 		try {
 			buf.writeVarInt(packet.getId());
+			BotHandler.getHandler().getLogger().debug("Wrote packet id (" + packet.getId() + ")");
 			packet.send(buf);
+			BotHandler.getHandler().getLogger().debug("Wrote packet data (" + packet + ")");
 
 			PacketOutputArray bufOut = (PacketOutputArray) buf.out;
 			PacketOutputArray bufferOut = (PacketOutputArray) buf.out;
-			buffer.writeVarInt(bufOut.toByteArray().length);
+			if(bufOut.toByteArray().length > 1) {
+				buffer.writeVarInt(bufOut.toByteArray().length);
+				BotHandler.getHandler().getLogger().debug("Wrote buffer array length (" + bufOut.toByteArray().length + ")");
+			}
 			buffer.write(bufOut.toByteArray());
 			byte[] array = bufferOut.toByteArray();
 			List<Byte> list = new ArrayList<>();
 			for(byte b : array) {
 				list.add(b);
 			}
-			BotHandler.getHandler().getLogger().info("Writing out bytes for " + packet.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
+			BotHandler.getHandler().getLogger().debug("Wrote buffer array contents (" + list + ")");
 			write(array);
 			flush();
+			BotHandler.getHandler().getLogger().debug("Wrote out bytes for " + packet.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
 		} catch(Exception ex) {
 			BotHandler.getHandler().getLogger().log("Could not send Packet (" + packet.getClass().getSimpleName() + "):  ", ex);
 		}
