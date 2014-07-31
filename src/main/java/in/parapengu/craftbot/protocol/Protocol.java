@@ -1,12 +1,15 @@
 package in.parapengu.craftbot.protocol;
 
+import in.parapengu.craftbot.event.Listener;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.net.Socket;
+import java.util.Map;
 
-public class Protocol {
+public class Protocol implements Listener {
 
+	protected Map<State, Map<Integer, Class<? extends Packet>>> packets;
 	private int version;
 	private String startingVersion;
 	private String endingVersion;
@@ -19,6 +22,10 @@ public class Protocol {
 		this.version = version;
 		this.startingVersion = startingVersion;
 		this.endingVersion = endingVersion;
+	}
+
+	public Map<State, Map<Integer, Class<? extends Packet>>> getPackets() {
+		return packets;
 	}
 
 	public int getVersion() {

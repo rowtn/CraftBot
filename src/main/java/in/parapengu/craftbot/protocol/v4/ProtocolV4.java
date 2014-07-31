@@ -42,7 +42,6 @@ import java.util.Map;
 
 public class ProtocolV4 extends Protocol implements Listener {
 
-	private Map<State, Map<Integer, Class<? extends Packet>>> packets;
 	private CraftBot bot;
 	private BotPacketStream stream;
 
@@ -87,7 +86,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 			return;
 		}
 
-		stream = new BotPacketStream(packets, socket, output, input, bot);
+		stream = new BotPacketStream(this, socket, output, input, bot);
 		new Thread(stream::start).start();
 
 		bot.setState(State.LOGIN);
