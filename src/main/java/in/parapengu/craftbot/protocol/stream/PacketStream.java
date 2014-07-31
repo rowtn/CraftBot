@@ -1,94 +1,106 @@
 package in.parapengu.craftbot.protocol.stream;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import in.parapengu.craftbot.bot.CraftBot;
+import in.parapengu.craftbot.event.EventManager;
+import in.parapengu.craftbot.event.packet.ReceivePacketEvent;
+import in.parapengu.craftbot.event.packet.SendPacketEvent;
 import in.parapengu.craftbot.logging.Logger;
+import in.parapengu.craftbot.protocol.Packet;
+import in.parapengu.craftbot.protocol.State;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
+import java.util.Map;
 
-public class PacketStream {
+public abstract class PacketStream {
 
-	private int state;
-	private CraftBot bot;
-	private Logger logger;
+	private Map<State, Map<Integer, Class<? extends Packet>>> packets;
+	private Socket socket;
+	private PacketOutputStream output;
+	private PacketInputStream input;
 
-	public PacketStream(CraftBot bot) {
-		this.bot = bot;
-		this.logger = bot.getLogger();
+	public PacketStream(Map<State, Map<Integer, Class<? extends Packet>>> packets, Socket socket, PacketOutputStream output, PacketInputStream input) {
+		this.packets = packets;
+		this.socket = socket;
+		this.output = output;
+		this.input = input;
 	}
 
-	public static String getString(DataInputStream in) {
-		int length;
-		String s = "";
+	public abstract State getState();
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public PacketOutputStream getOutput() {
+		return output;
+	}
+
+	public void setOutput(PacketOutputStream output) {
+		this.output = output;
+	}
+
+	public PacketInputStream getInput() {
+		return input;
+	}
+
+	public void setInput(PacketInputStream input) {
+		this.input = input;
+	}
+
+	public void sendPacket(Packet packet) {
+		SendPacketEvent event = getManager().call(new SendPacketEvent(packet));
+		if(event.isCancelled()) {
+			return;
+		}
+
+		getLogger().debug("Sent Packet: " + packet.toString());
+		output.sendPacket(packet);
+	}
+
+	public abstract Logger getLogger();
+
+	public abstract EventManager getManager();
+
+	public PacketStream start() {
+		while(input != null && socket.isConnected()) {
+			try {
+				getLogger().debug("Loooooooooping around!");
+				int length = input.readVarInt();
+				getLogger().debug("Read length: " + length);
+				int id = input.readVarInt();
+				getLogger().debug("Read id: " + id);
+
+				Class<? extends Packet> clazz = packets.get(getState()).get(id);
+				Packet packet = clazz.newInstance();
+				packet.build(input);
+				handle(packet);
+			} catch(Exception ex) {
+				getLogger().log("Packet error! ", ex);
+				try {
+					socket.close();
+					setInput(null);
+				} catch(Exception ex2) {
+					getLogger().log("Packet error! ", ex2);
+				}
+			}
+		}
+
+		return this;
+	}
+
+	public void handle(Packet packet) {
+		getManager().call(new ReceivePacketEvent(packet));
+	}
+
+	public void close() {
 		try {
-			length = readVarInt(in);
-			if(length < 0) {
-				throw new IOException(
-						"Received string length is less than zero! Weird string!");
-			}
-
-			if(length == 0) {
-				return "";
-			}
-			byte[] b = new byte[length];
-			in.readFully(b, 0, length);
-			s = new String(b, "UTF-8");
-		} catch(IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			output.close();
+			input.close();
+			socket.close();
+		} catch(IOException ex) {
+			getLogger().log("Could not close connection to " + socket.getInetAddress().getHostAddress() + ": ", ex);
 		}
-		return s;
+		setInput(null);
 	}
 
-	public static void sendPacket(ByteArrayDataOutput buf, DataOutputStream out) throws IOException {
-		ByteArrayDataOutput send1 = ByteStreams.newDataOutput();
-		writeVarInt(send1, buf.toByteArray().length);
-		send1.write(buf.toByteArray());
-		out.write(send1.toByteArray());
-		out.flush();
-	}
-
-	public static void writeString(ByteArrayDataOutput out, String s) throws IOException {
-		writeVarInt(out, s.length());
-		out.write(s.getBytes("UTF-8"));
-	}
-
-	public static int readVarInt(DataInputStream ins) throws IOException {
-		int i = 0;
-		int j = 0;
-		while(true) {
-			int k = ins.read();
-
-			i |= (k & 0x7F) << j++ * 7;
-
-			if(j > 5) throw new RuntimeException("VarInt too big");
-
-			if((k & 0x80) != 128) break;
-		}
-
-		return i;
-	}
-
-	public static void writeVarInt(ByteArrayDataOutput outs, int paramInt) throws IOException {
-		while(true) {
-			if((paramInt & 0xFFFFFF80) == 0) {
-				outs.writeByte((byte) paramInt);
-				return;
-			}
-
-			outs.writeByte((byte) (paramInt & 0x7F | 0x80));
-			paramInt >>>= 7;
-		}
-	}
-
-	public void read(int len) throws IOException {
-		//allow child to override
-	}
-
-	public void write() {
-		// Allow child to write
-	}
 }

@@ -49,7 +49,7 @@ public class PingCommand extends CommandHandler {
 			port = Integer.parseInt(split[1]);
 		}
 
-		Map<String, String> result = ServerPinger.ping(address, port);
+		Map<String, String> result = new ServerPinger().ping(address, port);
 		if(result == null) {
 			throw new CommandException("Could not connect to " + address + (port != 25565 ? ":" + port : ""));
 		}

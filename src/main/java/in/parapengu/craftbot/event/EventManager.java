@@ -2,6 +2,7 @@ package in.parapengu.craftbot.event;
 
 import com.google.common.collect.Lists;
 import in.parapengu.craftbot.bot.BotHandler;
+import in.parapengu.craftbot.event.packet.SendPacketEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 
@@ -87,7 +88,7 @@ public class EventManager {
 		}
 	}
 
-	public void call(Event event) {
+	public <T extends Event> T call(T event) {
 		List<PrioritisedMethods> methods = events.entrySet().stream().filter(entry -> entry.getKey().isAssignableFrom(event.getClass())).map(Entry::getValue).collect(Collectors.toList());
 		Map<EventPriority, List<EventMethod>> priorityMap = new HashMap<>();
 		for(EventPriority priority : EventPriority.values()) {
@@ -103,6 +104,8 @@ public class EventManager {
 				method.handle(event);
 			}
 		}
+
+		return event;
 	}
 
 }

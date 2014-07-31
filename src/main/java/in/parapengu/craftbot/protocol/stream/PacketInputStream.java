@@ -1,5 +1,6 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
 import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
 import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
@@ -29,8 +30,7 @@ public class PacketInputStream extends DataInputStream {
 		int j = 0;
 		while(true) {
 			int k = read();
-			if(k == -1)
-				throw new IOException("End of stream");
+			BotHandler.getHandler().getLogger().debug("Read " + k);
 
 			i |= (k & 0x7F) << j++ * 7;
 

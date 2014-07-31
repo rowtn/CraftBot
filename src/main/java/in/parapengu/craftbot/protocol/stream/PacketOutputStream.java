@@ -1,8 +1,10 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.NullOutputStream;
+import in.parapengu.commons.utils.OtherUtil;
 import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
 import in.parapengu.craftbot.inventory.nbt.CompressedStreamTools;
@@ -14,6 +16,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketOutputStream extends DataOutputStream {
 
@@ -77,15 +81,23 @@ public class PacketOutputStream extends DataOutputStream {
 	}
 
 	public void sendPacket(Packet packet) {
-		PacketOutputArray buffer = new PacketOutputArray();
-		PacketOutputArray buf = new PacketOutputArray();
+		PacketOutputStream buffer = new PacketOutputStream(new PacketOutputArray());
+		PacketOutputStream buf = new PacketOutputStream(new PacketOutputArray());
 		try {
 			buf.writeVarInt(packet.getId());
 			packet.send(buf);
 
-			buffer.writeVarInt(buf.toByteArray().length);
-			buffer.write(buf.toByteArray());
-			write(buffer.toByteArray());
+			PacketOutputArray bufOut = (PacketOutputArray) buf.out;
+			PacketOutputArray bufferOut = (PacketOutputArray) buf.out;
+			buffer.writeVarInt(bufOut.toByteArray().length);
+			buffer.write(bufOut.toByteArray());
+			byte[] array = bufferOut.toByteArray();
+			List<Byte> list = new ArrayList<>();
+			for(byte b : array) {
+				list.add(b);
+			}
+			BotHandler.getHandler().getLogger().info("Writing out bytes for " + packet.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
+			write(array);
 			flush();
 		} catch(Exception ex) {
 			BotHandler.getHandler().getLogger().log("Could not send Packet (" + packet.getClass().getSimpleName() + "):  ", ex);

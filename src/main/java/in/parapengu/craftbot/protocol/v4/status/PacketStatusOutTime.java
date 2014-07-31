@@ -1,4 +1,4 @@
-package in.parapengu.craftbot.protocol.v4.play;
+package in.parapengu.craftbot.protocol.v4.status;
 
 import in.parapengu.craftbot.protocol.Destination;
 import in.parapengu.craftbot.protocol.Packet;
@@ -8,26 +8,27 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.io.IOException;
 
-public class PacketPlayInKeepAlive extends Packet {
+public class PacketStatusOutTime extends Packet {
 
-	private int alive;
+	private long time;
 
-	public PacketPlayInKeepAlive() {
-		super(0x00);
+	public PacketStatusOutTime(long time) {
+		super(0x01);
+		this.time = time;
 	}
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.alive = input.readInt();
+		throw new PacketException("Can not receive an outbound packet", getClass(), Destination.CLIENT);
 	}
 
 	@Override
 	public void send(PacketOutputStream output) throws IOException {
-		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
+		output.writeLong(time);
 	}
 
-	public int getAlive() {
-		return alive;
+	public long getTime() {
+		return time;
 	}
 
 }

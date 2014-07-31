@@ -1,5 +1,7 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import org.apache.commons.io.output.NullOutputStream;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ public class PacketOutputArray extends PacketOutputStream {
 	private List<Byte> bytes;
 
 	public PacketOutputArray() {
-		super(null);
+		super(new NullOutputStream());
 		this.bytes = new ArrayList<>();
 	}
 

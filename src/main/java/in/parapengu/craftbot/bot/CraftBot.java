@@ -5,6 +5,7 @@ import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 import in.parapengu.craftbot.protocol.Packet;
+import in.parapengu.craftbot.protocol.State;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import in.parapengu.craftbot.protocol.v4.ProtocolV4;
@@ -26,6 +27,7 @@ public class CraftBot {
 	private String clientToken;
 	private String accessToken;
 
+	private State state;
 	private Socket socket;
 	private PacketOutputStream output;
 	private PacketInputStream input;
@@ -44,6 +46,8 @@ public class CraftBot {
 		logger = Logging.getLogger(username, BotHandler.getHandler().getLogger());
 		logger.info("Connected as " + username + " (" + uuid + ")");
 		manager = new EventManager();
+
+		state = State.STATUS;
 	}
 
 	public Logger getLogger() {
@@ -74,6 +78,14 @@ public class CraftBot {
 		return accessToken;
 	}
 
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
 	public Socket getSocket() {
 		return socket;
 	}
@@ -99,7 +111,7 @@ public class CraftBot {
 	}
 
 	public void connect(String address, int port) {
-		Map<String, String> ping = ServerPinger.ping(address, port);
+		Map<String, String> ping = new ServerPinger().ping(address, port);
 		if(ping == null) {
 			logger.warning("Could not connect to ...");
 			return;
