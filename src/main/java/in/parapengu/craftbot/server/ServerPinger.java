@@ -59,7 +59,7 @@ public class ServerPinger {
 
 				@Override
 				public void handle(Packet packet) {
-					getLogger().info("Received " + packet.getClass().getSimpleName() + ": " + packet.toString());
+					getLogger().debug("Received " + packet.getClass().getSimpleName() + ": " + packet.toString());
 					String response = result(packet);
 					if(response == null) {
 						return;

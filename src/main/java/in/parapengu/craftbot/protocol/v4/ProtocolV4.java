@@ -1,9 +1,15 @@
 package in.parapengu.craftbot.protocol.v4;
 
+import in.parapengu.craftbot.auth.AuthService;
+import in.parapengu.craftbot.auth.AuthenticationException;
+import in.parapengu.craftbot.auth.EncryptionUtil;
+import in.parapengu.craftbot.auth.InvalidSessionException;
+import in.parapengu.craftbot.auth.Session;
 import in.parapengu.craftbot.bot.CraftBot;
 import in.parapengu.craftbot.event.EventHandler;
 import in.parapengu.craftbot.event.Listener;
 import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
+import in.parapengu.craftbot.event.packet.ReceivePacketEvent;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.Protocol;
 import in.parapengu.craftbot.protocol.State;
@@ -11,33 +17,52 @@ import in.parapengu.craftbot.protocol.stream.BotPacketStream;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import in.parapengu.craftbot.protocol.v4.handshaking.PacketHandshakeOutStatus;
+import in.parapengu.craftbot.protocol.v4.login.PacketLoginInDisconnect;
+import in.parapengu.craftbot.protocol.v4.login.PacketLoginInEncryptionRequest;
+import in.parapengu.craftbot.protocol.v4.login.PacketLoginInSuccess;
+import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutEncryptionResponse;
+import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutStart;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInChatMessage;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityEquiptment;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInJoinGame;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInKeepAlive;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInTimeUpdate;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProtocolV4 extends Protocol implements Listener {
 
 	private Map<State, Map<Integer, Class<? extends Packet>>> packets;
+	private CraftBot bot;
+	private BotPacketStream stream;
 
 	public ProtocolV4() {
 		super(4, "1.7.2", "1.7.5");
 
 		packets = new HashMap<>();
 
-		Map<Integer, Class<? extends Packet>> status = new HashMap<>();
-		status.put(0x00, PacketPlayInKeepAlive.class);
-		packets.put(State.STATUS, status);
-
 		Map<Integer, Class<? extends Packet>> login = new HashMap<>();
-		login.put(0x00, PacketPlayInKeepAlive.class);
+		login.put(0x00, PacketLoginInDisconnect.class);
+		login.put(0x01, PacketLoginInEncryptionRequest.class);
+		login.put(0x02, PacketLoginInSuccess.class);
 		packets.put(State.LOGIN, login);
 
 		Map<Integer, Class<? extends Packet>> play = new HashMap<>();
 		login.put(0x00, PacketPlayInKeepAlive.class);
+		login.put(0x01, PacketPlayInJoinGame.class);
+		login.put(0x02, PacketPlayInChatMessage.class);
+		login.put(0x03, PacketPlayInTimeUpdate.class);
+		login.put(0x04, PacketPlayInEntityEquiptment.class);
 		packets.put(State.PLAY, play);
 	}
 
@@ -45,7 +70,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 	public void onConnect(BotConnectServerEvent event) {
 		event.getBot().getLogger().info("Testing connection to " + event.getAddress() + ":" + event.getPort());
 
-		CraftBot bot = event.getBot();
+		bot = event.getBot();
 		String address = event.getAddress();
 		int port = event.getPort();
 
@@ -62,11 +87,50 @@ public class ProtocolV4 extends Protocol implements Listener {
 			return;
 		}
 
-		BotPacketStream stream = new BotPacketStream(packets, socket, output, input, bot);
+		stream = new BotPacketStream(packets, socket, output, input, bot);
 		new Thread(stream::start).start();
 
 		bot.setState(State.LOGIN);
 		stream.sendPacket(new PacketHandshakeOutStatus(this, address, port, State.LOGIN));
+		stream.sendPacket(new PacketLoginOutStart(bot.getUsername()));
+	}
+
+	@EventHandler
+	public void onPacket(ReceivePacketEvent event) {
+		if(event.getPacket() instanceof PacketLoginInEncryptionRequest) {
+			PacketLoginInEncryptionRequest request = (PacketLoginInEncryptionRequest) event.getPacket();
+			String serverId = request.getServer().trim();
+			PublicKey publicKey;
+			try {
+				publicKey = EncryptionUtil.generatePublicKey(request.getKey());
+			} catch(GeneralSecurityException exception) {
+				throw new Error("Unable to generate public key", exception);
+			}
+			SecretKey secretKey = EncryptionUtil.generateSecretKey();
+
+			if(!serverId.equals("-")) {
+				try {
+					AuthService service = bot.getAuth();
+					Session session = bot.getSession();
+
+					String hash = new BigInteger(EncryptionUtil.encrypt(serverId, publicKey, secretKey)).toString(16);
+					service.authenticate(service.validateSession(session), hash);
+				} catch(InvalidSessionException exception) {
+					stream.getLogger().log("Session invalid: ", exception);
+					stream.close();
+				} catch(NoSuchAlgorithmException | UnsupportedEncodingException exception) {
+					stream.getLogger().log("Unable to hash: ", exception);
+					stream.close();
+				} catch(Exception exception) {
+					stream.getLogger().log("Unable to authenticate: ", exception);
+					stream.close();
+				}
+			}
+			stream.sendPacket(new PacketLoginOutEncryptionResponse(request.getKey(), request.getToken()));
+		} else if(event.getPacket() instanceof PacketLoginInSuccess) {
+			bot.getLogger().info("Logged in successfully!");
+			bot.setState(State.PLAY);
+		}
 	}
 
 }

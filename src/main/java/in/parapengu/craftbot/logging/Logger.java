@@ -43,7 +43,7 @@ public class Logger {
 	}
 
 	public boolean isDebug() {
-		return debug;
+		return debug || (parent != null && parent.isDebug());
 	}
 
 	public Logger setDebug(boolean debug) {
@@ -99,7 +99,7 @@ public class Logger {
 			String msg = message.toString();
 			if(message instanceof Exception) {
 				Exception ex = (Exception) message;
-				if(debug) {
+				if(isDebug()) {
 					ex.printStackTrace();
 					continue;
 				}

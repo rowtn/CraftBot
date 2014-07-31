@@ -1,4 +1,4 @@
-package in.parapengu.craftbot.protocol.v4.play;
+package in.parapengu.craftbot.protocol.v4.login;
 
 import in.parapengu.craftbot.protocol.Destination;
 import in.parapengu.craftbot.protocol.Packet;
@@ -8,12 +8,12 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.io.IOException;
 
-public class PacketPlayInChatMessage extends Packet {
+public class PacketLoginInDisconnect extends Packet {
 
 	private String json;
 
-	public PacketPlayInChatMessage() {
-		super(0x02);
+	public PacketLoginInDisconnect() {
+		super(0x00);
 	}
 
 	@Override

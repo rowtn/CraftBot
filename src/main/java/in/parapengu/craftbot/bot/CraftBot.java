@@ -1,47 +1,46 @@
 package in.parapengu.craftbot.bot;
 
+import in.parapengu.craftbot.auth.YggdrasilAuthService;
+import in.parapengu.craftbot.auth.YggdrasilSession;
 import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
-import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.State;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import in.parapengu.craftbot.protocol.v4.ProtocolV4;
 import in.parapengu.craftbot.server.ServerPinger;
-import org.json.JSONException;
 
-import java.io.IOException;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Map;
+import java.util.UUID;
 
 public class CraftBot {
 
 	private Logger logger;
-	private BotAuthenticator authenticator;
 	private EventManager manager;
 
+	private YggdrasilAuthService auth;
+	private YggdrasilSession session;
 	private String username;
 	private String uuid;
-	private String clientToken;
-	private String accessToken;
+	private UUID clientToken;
+	private BigInteger accessToken;
 
 	private State state;
 	private Socket socket;
 	private PacketOutputStream output;
 	private PacketInputStream input;
 
-	public CraftBot(String account, String password) throws IOException, JSONException {
-		authenticator = new BotAuthenticator(account, password);
-		if(!authenticator.authenticate()) {
-			throw new IllegalArgumentException("Username/Password combination was invalid!");
-		}
-
-		username = authenticator.getProfileName();
-		uuid = authenticator.getProfileID();
-		clientToken = authenticator.getClientToken();
-		accessToken = authenticator.getAccessToken();
+	public CraftBot(String account, String password) throws Exception {
+		auth = new YggdrasilAuthService();
+		session = auth.login(account, password);
+		username = session.getSelectedProfile().getName();
+		uuid = session.getSelectedProfile().getId();
+		clientToken = session.getClientToken();
+		accessToken = session.getAccessToken();
 
 		logger = Logging.getLogger(username, BotHandler.getHandler().getLogger());
 		logger.info("Connected as " + username + " (" + uuid + ")");
@@ -54,12 +53,16 @@ public class CraftBot {
 		return logger;
 	}
 
-	public BotAuthenticator getAuthenticator() {
-		return authenticator;
-	}
-
 	public EventManager getEventManager() {
 		return manager;
+	}
+
+	public YggdrasilAuthService getAuth() {
+		return auth;
+	}
+
+	public YggdrasilSession getSession() {
+		return session;
 	}
 
 	public String getUsername() {
@@ -70,11 +73,11 @@ public class CraftBot {
 		return uuid;
 	}
 
-	public String getClientToken() {
+	public UUID getClientToken() {
 		return clientToken;
 	}
 
-	public String getAccessToken() {
+	public BigInteger getAccessToken() {
 		return accessToken;
 	}
 

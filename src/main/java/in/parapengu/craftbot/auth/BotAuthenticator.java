@@ -1,4 +1,4 @@
-package in.parapengu.craftbot.bot;
+package in.parapengu.craftbot.auth;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;

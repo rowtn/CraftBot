@@ -80,17 +80,19 @@ public abstract class PacketStream {
 				getLogger().debug("Read id: " + id);
 
 				Class<? extends Packet> clazz = packets.get(getState()).get(id);
+				if(clazz == null) {
+					getLogger().severe("Could not find packet with id #" + id);
+					close();
+					break;
+				}
+
 				Packet packet = clazz.newInstance();
+				getLogger().debug("Created new " + clazz.getSimpleName());
 				packet.build(input);
 				handle(packet);
 			} catch(Exception ex) {
 				getLogger().log("Packet error! ", ex);
-				try {
-					socket.close();
-					setInput(null);
-				} catch(Exception ex2) {
-					getLogger().log("Packet error! ", ex2);
-				}
+				close();
 			}
 		}
 

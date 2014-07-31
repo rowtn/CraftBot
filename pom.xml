@@ -62,9 +62,19 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.fusesource.jansi</groupId>
 			<artifactId>jansi</artifactId>
 			<version>1.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.49</version>
 		</dependency>
 	</dependencies>
 
@@ -111,6 +121,8 @@
 									<include>org.json:json</include>
 									<include>commons-io:commons-io</include>
 									<include>org.fusesource.jansi:jansi</include>
+									<include>org.bouncycastle:bcprov-jdk15on</include>
+									<include>org.apache.commons:commons-lang3</include>
 								</includes>
 							</artifactSet>
 							<filters>
