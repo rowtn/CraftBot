@@ -22,11 +22,18 @@ import in.parapengu.craftbot.protocol.v4.login.PacketLoginInEncryptionRequest;
 import in.parapengu.craftbot.protocol.v4.login.PacketLoginInSuccess;
 import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutEncryptionResponse;
 import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutStart;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInAnimation;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInChatMessage;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityEquiptment;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInHeldItemChange;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInJoinGame;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInKeepAlive;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInPlayerPosition;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInRespawn;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPosition;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInTimeUpdate;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUpdateHealth;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUseBed;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -62,6 +69,13 @@ public class ProtocolV4 extends Protocol implements Listener {
 		login.put(0x02, PacketPlayInChatMessage.class);
 		login.put(0x03, PacketPlayInTimeUpdate.class);
 		login.put(0x04, PacketPlayInEntityEquiptment.class);
+		login.put(0x05, PacketPlayInSpawnPosition.class);
+		login.put(0x06, PacketPlayInUpdateHealth.class);
+		login.put(0x07, PacketPlayInRespawn.class);
+		login.put(0x08, PacketPlayInPlayerPosition.class);
+		login.put(0x09, PacketPlayInHeldItemChange.class);
+		login.put(0x0A, PacketPlayInUseBed.class);
+		login.put(0x0B, PacketPlayInAnimation.class);
 		packets.put(State.PLAY, play);
 	}
 

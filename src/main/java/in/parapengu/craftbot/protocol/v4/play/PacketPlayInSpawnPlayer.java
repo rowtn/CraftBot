@@ -8,19 +8,23 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.io.IOException;
 
-public class PacketPlayInTimeUpdate extends Packet {
+public class PacketPlayInSpawnPlayer extends Packet {
 
-	private long age;
-	private long time;
+	private int entity;
+	private int x;
+	private int y;
+	private int z;
 
-	public PacketPlayInTimeUpdate() {
-		super(0x05);
+	public PacketPlayInSpawnPlayer() {
+		super(0x0A);
 	}
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.age = input.readLong();
-		this.time = input.readLong();
+		this.entity = input.readInt();
+		this.x = input.readInt();
+		this.y = input.readUnsignedByte();
+		this.z = input.readInt();
 	}
 
 	@Override
@@ -28,12 +32,20 @@ public class PacketPlayInTimeUpdate extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public long getAge() {
-		return age;
+	public int getEntity() {
+		return entity;
 	}
 
-	public long getTime() {
-		return time;
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public int getZ() {
+		return z;
 	}
 
 }
