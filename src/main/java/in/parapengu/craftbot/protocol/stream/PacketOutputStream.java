@@ -1,9 +1,5 @@
 package in.parapengu.craftbot.protocol.stream;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.NullOutputStream;
 import in.parapengu.commons.utils.OtherUtil;
 import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.inventory.ItemStack;
@@ -14,7 +10,6 @@ import in.parapengu.craftbot.protocol.Packet;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
