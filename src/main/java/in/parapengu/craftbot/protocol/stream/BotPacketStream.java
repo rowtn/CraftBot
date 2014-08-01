@@ -15,8 +15,8 @@ public class BotPacketStream extends PacketStream {
 	private Protocol protocol;
 	private CraftBot bot;
 
-	public BotPacketStream(Protocol protocol, String address, int port, CraftBot bot) {
-		super(protocol.getPackets(), address, port);
+	public BotPacketStream(Protocol protocol, Socket socket, PacketOutputStream output, PacketInputStream input, CraftBot bot) {
+		super(protocol.getPackets(), socket, output, input);
 		this.protocol = protocol;
 		this.bot = bot;
 	}
@@ -55,8 +55,14 @@ public class BotPacketStream extends PacketStream {
 	}
 
 	@Override
-	public void disconnect(String reason) {
-		super.disconnect(reason);
+	public BotPacketStream start() {
+		super.start();
+		return this;
+	}
+
+	@Override
+	public void close() {
+		super.close();
 		bot.getEventManager().unregister(protocol);
 	}
 

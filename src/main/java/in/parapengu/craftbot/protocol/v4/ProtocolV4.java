@@ -10,7 +10,6 @@ import in.parapengu.craftbot.event.EventHandler;
 import in.parapengu.craftbot.event.Listener;
 import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.event.packet.ReceivePacketEvent;
-import in.parapengu.craftbot.event.packet.SendPacketEvent;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.Protocol;
 import in.parapengu.craftbot.protocol.State;
@@ -100,7 +99,21 @@ public class ProtocolV4 extends Protocol implements Listener {
 		bot = event.getBot();
 		String address = event.getAddress();
 		int port = event.getPort();
-		stream = new BotPacketStream(this, address, port, bot);
+
+		try {
+			socket = new Socket();
+			socket.connect(new InetSocketAddress(address, port), 20*1000);
+			output = new PacketOutputStream(socket.getOutputStream());
+			input = new PacketInputStream(socket.getInputStream());
+			bot.setSocket(socket);
+			bot.setOutput(output);
+			bot.setInput(input);
+		} catch(IOException ex) {
+			bot.getLogger().log("Could not connect to " + address + (port != 25565 ? ":" + port : "") + ": ", ex);
+			return;
+		}
+
+		stream = new BotPacketStream(this, socket, output, input, bot);
 		new Thread(stream::start).start();
 
 		bot.setState(State.LOGIN);
@@ -131,47 +144,20 @@ public class ProtocolV4 extends Protocol implements Listener {
 					service.authenticate(service.validateSession(session), hash);
 				} catch(InvalidSessionException exception) {
 					stream.getLogger().log("Session invalid: ", exception);
-					stream.disconnect("Session invalid");
+					stream.close();
 				} catch(NoSuchAlgorithmException | UnsupportedEncodingException exception) {
 					stream.getLogger().log("Unable to hash: ", exception);
-					stream.disconnect("Unable to hash");
+					stream.close();
 				} catch(Exception exception) {
 					stream.getLogger().log("Unable to authenticate: ", exception);
-					stream.disconnect("Unable to authenticate");
+					stream.close();
 				}
 			}
 
-			stream.pauseReading();
 			stream.sendPacket(new PacketLoginOutEncryptionResponse(secretKey, publicKey, request.getToken()));
 		} else if(event.getPacket() instanceof PacketLoginInSuccess) {
 			bot.getLogger().info("Logged in successfully!");
 			bot.setState(State.PLAY);
-		}
-	}
-
-	@EventHandler
-	public void onSend(SendPacketEvent event) {
-		if(event.getPacket() instanceof PacketLoginOutEncryptionResponse) {
-			PacketLoginOutEncryptionResponse packet = (PacketLoginOutEncryptionResponse) event.getPacket();
-			if(stream.getSharedKey() != null) {
-				stream.disconnect("Shared key already installed!");
-				return;
-			}
-
-			if(!stream.isEncrypting()) {
-				stream.setSharedKey(packet.getSecretKey());
-				stream.enableEncryption();
-			}
-
-			if(stream.getSharedKey() == null) {
-				stream.disconnect("No shared key!");
-				return;
-			}
-
-			if(!stream.isDecrypting()) {
-				stream.enableDecryption();
-				stream.resumeReading();
-			}
 		}
 	}
 

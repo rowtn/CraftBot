@@ -26,16 +26,6 @@ public class PacketInputStream extends DataInputStream {
 		return new String(data, UTF8);
 	}
 
-	public int getVarIntLength(int varInt) {
-		int size = 0;
-		while(true) {
-			size++;
-			if((varInt & 0xFFFFFF80) == 0)
-				return size;
-			varInt >>>= 7;
-		}
-	}
-
 	public int readVarInt() throws IOException {
 		int i = 0;
 		int j = 0;
@@ -141,10 +131,6 @@ public class PacketInputStream extends DataInputStream {
 			map.put(i, data);
 		}
 		return map;
-	}
-
-	public InputStream getInput() {
-		return in;
 	}
 
 }

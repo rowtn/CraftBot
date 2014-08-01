@@ -13,8 +13,8 @@ public class GlobalPacketStream extends PacketStream {
 
 	private State state;
 
-	public GlobalPacketStream(Map<State, Map<Integer, Class<? extends Packet>>> packets, String address, int port) {
-		super(packets, address, port);
+	public GlobalPacketStream(Map<State, Map<Integer, Class<? extends Packet>>> packets, Socket socket, PacketOutputStream output, PacketInputStream input) {
+		super(packets, socket, output, input);
 		this.state = State.STATUS;
 	}
 
@@ -35,6 +35,12 @@ public class GlobalPacketStream extends PacketStream {
 	@Override
 	public Logger getLogger() {
 		return BotHandler.getHandler().getLogger();
+	}
+
+	@Override
+	public GlobalPacketStream start() {
+		super.start();
+		return this;
 	}
 
 }
