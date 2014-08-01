@@ -25,6 +25,7 @@ import in.parapengu.craftbot.protocol.v4.login.PacketLoginOutStart;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInAnimation;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInChatMessage;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInCollectItem;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInDisconnect;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntity;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityAttach;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityDestroy;
@@ -133,6 +134,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 		play.put(0x38, PacketPlayInPlayerListItem.class);
 		play.put(0x39, PacketPlayInPlayerAbilities.class);
 		play.put(0x3F, PacketPlayInPluginMessage.class);
+		play.put(0x40, PacketPlayInDisconnect.class);
 		packets.put(State.PLAY, play);
 		maxIds.put(State.PLAY, 0x40);
 	}
