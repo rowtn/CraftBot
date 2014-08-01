@@ -1,16 +1,11 @@
 package in.parapengu.craftbot.protocol.v4.play;
 
-import in.parapengu.craftbot.protocol.Destination;
-import in.parapengu.craftbot.protocol.Packet;
-import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
-import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.io.IOException;
 
-public class PacketPlayInEntityEquipment extends Packet {
+public class PacketPlayInEntityEquipment extends PacketPlayInEntity {
 
-	private int entity;
 	private EquipmentSlot slot;
 
 	public PacketPlayInEntityEquipment() {
@@ -19,13 +14,8 @@ public class PacketPlayInEntityEquipment extends Packet {
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.entity = input.readInt();
+		super.build(input);
 		this.slot = EquipmentSlot.values()[input.readShort()];
-	}
-
-	@Override
-	public void send(PacketOutputStream output) throws IOException {
-		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
 	public static enum EquipmentSlot {

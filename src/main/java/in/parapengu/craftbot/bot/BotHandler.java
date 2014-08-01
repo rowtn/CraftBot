@@ -106,6 +106,7 @@ public class BotHandler {
 		JSONArray accounts = new JSONArray(builder.toString());
 		for(int i = 0; i < accounts.length(); i++) {
 			final JSONObject object = accounts.getJSONObject(i);
+			/*
 			new Thread(() -> {
 				String username;
 				String password;
@@ -121,6 +122,20 @@ public class BotHandler {
 				register(username, password);
 				loaded++;
 			}).start();
+			*/
+			String username;
+			String password;
+			try {
+				username = object.getString("username");
+				password = object.getString("password");
+			} catch(JSONException ex) {
+				logger.info("Error while parsing " + accountsFile.toPath() + ": " + ex.getMessage());
+				loaded++;
+				return;
+			}
+
+			register(username, password);
+			loaded++;
 		}
 
 		while(accounts.length() > loaded) {
