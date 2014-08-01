@@ -135,4 +135,8 @@ public class PacketOutputStream extends DataOutputStream {
 		BotHandler.getHandler().getLogger().debug("Wrote out bytes for " + data.getClass().getSimpleName() + ": " + OtherUtil.listToEnglishCompound(list, "", ""));
 	}
 
+	public OutputStream getOutput() {
+		return out;
+	}
+
 }

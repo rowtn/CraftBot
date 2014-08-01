@@ -16,10 +16,6 @@ public class Protocol implements Listener {
 	private String startingVersion;
 	private String endingVersion;
 
-	protected Socket socket;
-	protected PacketOutputStream output;
-	protected PacketInputStream input;
-
 	protected Protocol(int version, String startingVersion, String endingVersion) {
 		this.version = version;
 		this.startingVersion = startingVersion;
