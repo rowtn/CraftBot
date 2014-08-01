@@ -8,12 +8,12 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.io.IOException;
 
-public class PacketPlayInEntityEquiptment extends Packet {
+public class PacketPlayInEntityEquipment extends Packet {
 
 	private int entity;
 	private EquipmentSlot slot;
 
-	public PacketPlayInEntityEquiptment() {
+	public PacketPlayInEntityEquipment() {
 		super(0x04);
 	}
 
