@@ -1,13 +1,16 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import in.parapengu.craftbot.auth.EncryptionUtil;
 import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.event.packet.ReceivePacketEvent;
 import in.parapengu.craftbot.event.packet.SendPacketEvent;
+import in.parapengu.craftbot.event.packet.SentPacketEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.State;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Map;
@@ -18,6 +21,8 @@ public abstract class PacketStream {
 	private Socket socket;
 	private PacketOutputStream output;
 	private PacketInputStream input;
+	private boolean encryption;
+	private boolean decryption;
 
 	public PacketStream(Map<State, Map<Integer, Class<? extends Packet>>> packets, Socket socket, PacketOutputStream output, PacketInputStream input) {
 		this.packets = packets;
@@ -61,6 +66,7 @@ public abstract class PacketStream {
 
 		try {
 			output.sendPacket(packet);
+			getManager().call(new SentPacketEvent(packet));
 			getLogger().debug("Sent Packet: " + packet.toString());
 		} catch(IOException ex) {
 			BotHandler.getHandler().getLogger().log("Could not send Packet (" + packet.getClass().getSimpleName() + "):  ", ex);
@@ -116,13 +122,37 @@ public abstract class PacketStream {
 	public void close() {
 		getLogger().warning("Closing connection with " + socket.getInetAddress().getHostAddress());
 		try {
-			output.close();
-			input.close();
-			socket.close();
+			if(output != null) {
+				output.close();
+			}
+
+			if(input != null) {
+				input.close();
+			}
+
+			if(socket != null) {
+				socket.close();
+			}
 		} catch(IOException ex) {
 			getLogger().log("Could not close connection to " + socket.getInetAddress().getHostAddress() + ": ", ex);
 		}
 		setInput(null);
+	}
+
+	public void encrypt(SecretKey key) {
+		if(encryption) {
+			return;
+		}
+
+		setOutput(new PacketOutputStream(EncryptionUtil.encryptOutputStream(output, key)));
+	}
+
+	public void decrypt(SecretKey key) {
+		if(decryption) {
+			return;
+		}
+
+		setInput(new PacketInputStream(EncryptionUtil.decryptInputStream(input, key)));
 	}
 
 }

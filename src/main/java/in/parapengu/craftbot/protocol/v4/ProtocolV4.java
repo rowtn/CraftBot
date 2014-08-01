@@ -1,7 +1,6 @@
 package in.parapengu.craftbot.protocol.v4;
 
 import in.parapengu.craftbot.auth.AuthService;
-import in.parapengu.craftbot.auth.AuthenticationException;
 import in.parapengu.craftbot.auth.EncryptionUtil;
 import in.parapengu.craftbot.auth.InvalidSessionException;
 import in.parapengu.craftbot.auth.Session;
@@ -10,6 +9,7 @@ import in.parapengu.craftbot.event.EventHandler;
 import in.parapengu.craftbot.event.Listener;
 import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.event.packet.ReceivePacketEvent;
+import in.parapengu.craftbot.event.packet.SentPacketEvent;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.Protocol;
 import in.parapengu.craftbot.protocol.State;
@@ -29,12 +29,15 @@ import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityEquiptment;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInHeldItemChange;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInJoinGame;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInKeepAlive;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInPlayerAbilities;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInPlayerPosition;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInPluginMessage;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInRespawn;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnMob;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnObject;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPlayer;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInSpawnPosition;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInStatistics;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInTimeUpdate;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUpdateHealth;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInUseBed;
@@ -87,6 +90,9 @@ public class ProtocolV4 extends Protocol implements Listener {
 		play.put(0x0D, PacketPlayInCollectItem.class);
 		play.put(0x0E, PacketPlayInSpawnObject.class);
 		play.put(0x0F, PacketPlayInSpawnMob.class);
+		play.put(0x37, PacketPlayInStatistics.class);
+		play.put(0x39, PacketPlayInPlayerAbilities.class);
+		play.put(0x3F, PacketPlayInPluginMessage.class);
 		packets.put(State.PLAY, play);
 		maxIds.put(State.PLAY, 0x40);
 	}
@@ -158,6 +164,15 @@ public class ProtocolV4 extends Protocol implements Listener {
 		} else if(event.getPacket() instanceof PacketLoginInSuccess) {
 			bot.getLogger().info("Logged in successfully!");
 			bot.setState(State.PLAY);
+		}
+	}
+
+	@EventHandler
+	public void onPacket(SentPacketEvent event) {
+		if(event.getPacket() instanceof PacketLoginOutEncryptionResponse) {
+			PacketLoginOutEncryptionResponse packet = (PacketLoginOutEncryptionResponse) event.getPacket();
+			stream.encrypt(packet.getSecretKey());
+			stream.decrypt(packet.getSecretKey());
 		}
 	}
 

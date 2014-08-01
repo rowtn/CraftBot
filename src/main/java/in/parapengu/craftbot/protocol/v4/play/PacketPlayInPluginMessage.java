@@ -5,22 +5,25 @@ import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class PacketPlayInChatMessage extends Packet {
+public class PacketPlayInPluginMessage extends Packet {
 
-	private JSONObject json;
+	private String channel;
+	private short length;
+	private byte[] bytes;
 
-	public PacketPlayInChatMessage() {
-		super(0x02);
+	public PacketPlayInPluginMessage() {
+		super(0x3F);
 	}
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.json = new JSONObject(input.readString());
+		this.channel = input.readString();
+		this.length = input.readShort();
+		this.bytes = new byte[length];
+		input.readFully(bytes);
 	}
 
 	@Override
@@ -28,8 +31,16 @@ public class PacketPlayInChatMessage extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public JSONObject getJSON() {
-		return json;
+	public String getChannel() {
+		return channel;
+	}
+
+	public short getLength() {
+		return length;
+	}
+
+	public byte[] getBytes() {
+		return bytes;
 	}
 
 }
