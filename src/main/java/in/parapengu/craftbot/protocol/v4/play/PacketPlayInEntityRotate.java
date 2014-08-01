@@ -9,7 +9,7 @@ public class PacketPlayInEntityRotate extends PacketPlayInEntity {
 	private double yaw;
 
 	public PacketPlayInEntityRotate() {
-		super(0x16);
+		super(0x19);
 	}
 
 	protected PacketPlayInEntityRotate(int id) {

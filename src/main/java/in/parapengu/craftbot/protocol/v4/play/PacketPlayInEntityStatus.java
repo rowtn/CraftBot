@@ -9,7 +9,7 @@ public class PacketPlayInEntityStatus extends PacketPlayInEntity {
 	private int status;
 
 	public PacketPlayInEntityStatus() {
-		super(0x16);
+		super(0x1A);
 	}
 
 	@Override
