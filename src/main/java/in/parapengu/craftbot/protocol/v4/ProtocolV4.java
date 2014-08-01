@@ -33,6 +33,7 @@ import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityEquipment;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityLook;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityLookRelativeMove;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityMetadata;
+import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityProperties;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityRelativeMove;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityRemoveEffect;
 import in.parapengu.craftbot.protocol.v4.play.PacketPlayInEntityRotate;
@@ -125,6 +126,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 		play.put(0x1D, PacketPlayInEntityEffect.class);
 		play.put(0x1E, PacketPlayInEntityRemoveEffect.class);
 		play.put(0x1F, PacketPlayInExperience.class);
+		play.put(0x20, PacketPlayInEntityProperties.class);
 		play.put(0x2F, PacketPlayInSetSlot.class);
 		play.put(0x30, PacketPlayInWindowItems.class);
 		play.put(0x37, PacketPlayInStatistics.class);
