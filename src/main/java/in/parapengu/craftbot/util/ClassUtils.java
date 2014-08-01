@@ -72,7 +72,7 @@ public class ClassUtils {
 			string.append(",");
 		}
 
-		string.append("class").append("=").append(clazz.getName());
+		string.append("class").append("=").append(object.getClass().getName());
 
 		string.append("}");
 		return string.toString();
