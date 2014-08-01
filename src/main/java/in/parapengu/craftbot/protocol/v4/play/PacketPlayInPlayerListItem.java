@@ -5,21 +5,24 @@ import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class PacketPlayInChatMessage extends Packet {
+public class PacketPlayInPlayerListItem extends Packet {
 
-	private JSONObject json;
+	private String name;
+	private boolean online;
+	private short ping;
 
-	public PacketPlayInChatMessage() {
-		super(0x02);
+	public PacketPlayInPlayerListItem() {
+		super(0x38);
 	}
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.json = new JSONObject(input.readString());
+		this.name = input.readString();
+		this.online = input.readBoolean();
+		this.ping = input.readShort();
 	}
 
 	@Override
@@ -27,8 +30,16 @@ public class PacketPlayInChatMessage extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public JSONObject getJSON() {
-		return json;
+	public String getName() {
+		return name;
+	}
+
+	public boolean isOnline() {
+		return online;
+	}
+
+	public short getPing() {
+		return ping;
 	}
 
 }
