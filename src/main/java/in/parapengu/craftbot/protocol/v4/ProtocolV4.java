@@ -219,6 +219,8 @@ public class ProtocolV4 extends Protocol implements Listener {
 		} else if(event.getPacket() instanceof PacketLoginInSuccess) {
 			bot.getLogger().info("Logged in successfully!");
 			bot.setState(State.PLAY);
+		} else if(event.getPacket() instanceof PacketPlayInKeepAlive) {
+			stream.sendPacket(new PacketPlayOutKeepAlive(((PacketPlayInKeepAlive) event.getPacket()).getAliveId()));
 		}
 	}
 
