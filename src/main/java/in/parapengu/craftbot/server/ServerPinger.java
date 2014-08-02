@@ -1,26 +1,18 @@
 package in.parapengu.craftbot.server;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.bot.ChatColor;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.State;
 import in.parapengu.craftbot.protocol.stream.GlobalPacketStream;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
-import in.parapengu.craftbot.protocol.stream.PacketOutputArray;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
-import in.parapengu.craftbot.protocol.stream.PacketStream;
 import in.parapengu.craftbot.protocol.v4.handshaking.PacketHandshakeOutStatus;
-import in.parapengu.craftbot.protocol.v4.play.PacketPlayInKeepAlive;
-import in.parapengu.craftbot.protocol.v4.status.PacketStatusInResponse;
-import in.parapengu.craftbot.protocol.v4.status.PacketStatusInTime;
-import in.parapengu.craftbot.protocol.v4.status.PacketStatusOutRequest;
-import in.parapengu.craftbot.protocol.v4.status.PacketStatusOutTime;
+import in.parapengu.craftbot.protocol.v4.status.server.PacketStatusInResponse;
+import in.parapengu.craftbot.protocol.v4.status.server.PacketStatusInTime;
+import in.parapengu.craftbot.protocol.v4.status.client.PacketStatusOutRequest;
+import in.parapengu.craftbot.protocol.v4.status.client.PacketStatusOutTime;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
