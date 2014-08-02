@@ -1,6 +1,5 @@
 package in.parapengu.craftbot.protocol.v4.play;
 
-import in.parapengu.craftbot.material.MaterialData;
 import in.parapengu.craftbot.protocol.Destination;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;
@@ -9,34 +8,27 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
 import java.io.IOException;
 
-public class PacketPlayInBlockChange extends Packet {
+public class PacketPlayInBlockAction extends Packet {
 
 	private int x;
 	private int y;
 	private int z;
-	private MaterialData data;
+	private int data1;
+	private int data2;
+	private int type;
 
-	public PacketPlayInBlockChange() {
-		super(0x23);
-	}
-
-	protected PacketPlayInBlockChange(int x, int y, int z, int id, int meta) {
-		this();
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.data = new MaterialData(id, (byte) meta);
+	public PacketPlayInBlockAction() {
+		super(0x24);
 	}
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
 		this.x = input.readInt();
-		this.y = input.readUnsignedByte();
+		this.y = input.readShort();
 		this.z = input.readInt();
-
-		int id = input.readVarInt();
-		int meta = input.readUnsignedByte();
-		this.data = new MaterialData(id, (byte) meta);
+		this.data1 = input.readUnsignedByte();
+		this.data2 = input.readUnsignedByte();
+		this.type = input.readVarInt();
 	}
 
 	@Override
@@ -56,8 +48,16 @@ public class PacketPlayInBlockChange extends Packet {
 		return z;
 	}
 
-	public MaterialData getData() {
-		return data;
+	public int getData1() {
+		return data1;
+	}
+
+	public int getData2() {
+		return data2;
+	}
+
+	public int getType() {
+		return type;
 	}
 
 }

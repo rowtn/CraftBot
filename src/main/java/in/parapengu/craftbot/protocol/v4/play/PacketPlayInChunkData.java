@@ -29,8 +29,8 @@ public class PacketPlayInChunkData extends Packet {
 		int secondaryBitmask = input.readShort();
 
 		int length = input.readInt();
-		byte[] compressedChunkData = new byte[length];
-		input.readFully(compressedChunkData, 0, length);
+		byte[] compressed = new byte[length];
+		input.readFully(compressed, 0, length);
 		int i = 0;
 
 		for(int j = 0; j < 16; j++)
@@ -41,11 +41,10 @@ public class PacketPlayInChunkData extends Packet {
 		if(biomes)
 			k += 256;
 
-		byte[] chunkData = new byte[k];
-		Inflater inflater = new Inflater();
-		inflater.setInput(compressedChunkData, 0, length);
-		inflate(inflater, chunkData, compressedChunkData, length);
-		this.data = new ChunkData(x, z, primaryBitmask, secondaryBitmask, chunkData);
+		byte[] data = new byte[k];
+		ChunkInflater inflater = new ChunkInflater(getClass(), data, compressed, length);
+		inflater.inflate();
+		this.data = new ChunkData(x, z, primaryBitmask, secondaryBitmask, data);
 	}
 
 	@Override
@@ -53,26 +52,7 @@ public class PacketPlayInChunkData extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public void inflate(Inflater inflater, byte[] chunkData, byte[] compressedChunkData, int length) throws PacketException {
-		try {
-			inflater.inflate(chunkData);
-		} catch(OutOfMemoryError error) {
-			System.gc();
-			attempts++;
-			if(attempts >= 5) {
-				throw new PacketException("Gave up attempting to decompress chunk data", getClass(), Destination.CLIENT);
-			}
 
-			inflater.end();
-			inflater = new Inflater();
-			inflater.setInput(compressedChunkData, 0, length);
-			inflate(inflater, chunkData, compressedChunkData, length);
-		} catch(DataFormatException ex) {
-			throw new PacketException("Bad compressed data format", getClass(), Destination.CLIENT);
-		} finally {
-			inflater.end();
-		}
-	}
 
 	public ChunkData getChunk() {
 		return data;
@@ -82,7 +62,7 @@ public class PacketPlayInChunkData extends Packet {
 		return biomes;
 	}
 
-	public static final class ChunkData {
+	public static class ChunkData {
 
 		private int x;
 		private int z;
@@ -116,6 +96,63 @@ public class PacketPlayInChunkData extends Packet {
 
 		public byte[] getData() {
 			return data;
+		}
+
+	}
+
+	public static class ChunkInflater {
+
+		private Class<? extends Packet> packet;
+		private Inflater inflater;
+		private byte[] data;
+		private byte[] compressed;
+		private int length;
+		private int attempts;
+
+		public ChunkInflater(Class<? extends Packet> packet, byte[] data, byte[] compressed, int length) {
+			this.packet = packet;
+			this.inflater = new Inflater();
+			this.data = data;
+			this.compressed = compressed;
+			this.length = length;
+			this.inflater.setInput(compressed, 0, length);
+		}
+
+		public void inflate() throws PacketException {
+			try {
+				inflater.inflate(data);
+			} catch(OutOfMemoryError error) {
+				System.gc();
+				attempts++;
+				if(attempts >= 5) {
+					throw new PacketException("Gave up attempting to decompress chunk data", packet, Destination.CLIENT);
+				}
+
+				inflater.end();
+				inflater = new Inflater();
+				inflater.setInput(compressed, 0, length);
+				inflate();
+			} catch(DataFormatException ex) {
+				throw new PacketException("Bad compressed data format", packet, Destination.CLIENT);
+			} finally {
+				inflater.end();
+			}
+		}
+
+		public Inflater getInflater() {
+			return inflater;
+		}
+
+		public byte[] getData() {
+			return data;
+		}
+
+		public byte[] getCompressed() {
+			return compressed;
+		}
+
+		public int getLength() {
+			return length;
 		}
 
 	}
