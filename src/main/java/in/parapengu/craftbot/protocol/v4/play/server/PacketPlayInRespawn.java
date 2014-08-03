@@ -10,8 +10,8 @@ import java.io.IOException;
 
 public class PacketPlayInRespawn extends Packet {
 
+	private int dimension;
 	private int gamemode;
-	private byte dimension;
 	private int difficulty;
 	private String level;
 
@@ -21,9 +21,9 @@ public class PacketPlayInRespawn extends Packet {
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.dimension = input.readByte();
+		this.dimension = input.readInt();
 		if(dimension < -1 || 1 < dimension) {
-			throw new PacketException("Invalid dimension supplied", getClass(), Destination.CLIENT);
+			throw new PacketException("Invalid dimension (" + dimension + ") supplied", getClass(), Destination.CLIENT);
 		}
 
 		this.gamemode = input.readUnsignedByte();
@@ -36,12 +36,12 @@ public class PacketPlayInRespawn extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public int getGamemode() {
-		return gamemode;
+	public int getDimension() {
+		return dimension;
 	}
 
-	public byte getDimension() {
-		return dimension;
+	public int getGamemode() {
+		return gamemode;
 	}
 
 	public int getDifficulty() {
