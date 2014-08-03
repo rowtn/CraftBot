@@ -97,14 +97,18 @@ public abstract class PacketStream {
 				int id = input.readVarInt();
 				getLogger().debug("Read id: " + id);
 				if(!validate(id)) {
-					break;
-				}
+					if(length != 1) {
+						break;
+					}
 
-				Class<? extends Packet> clazz = packets.get(getState()).get(id);
-				Packet packet = clazz.newInstance();
-				getLogger().debug("Created new " + clazz.getSimpleName());
-				packet.build(input);
-				handle(packet);
+					getLogger().debug("Received unknown Packet #" + id + ", ignoring it because it was only 1 byte long");
+				} else {
+					Class<? extends Packet> clazz = packets.get(getState()).get(id);
+					Packet packet = clazz.newInstance();
+					getLogger().debug("Created new " + clazz.getSimpleName());
+					packet.build(input);
+					handle(packet);
+				}
 			} catch(Exception ex) {
 				getLogger().log("Packet error! ", ex);
 				break;
