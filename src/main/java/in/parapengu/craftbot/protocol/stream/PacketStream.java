@@ -98,21 +98,26 @@ public abstract class PacketStream {
 					break;
 				}
 
-				int id = input.readVarInt();
+				int[] array = getVarInt();
+				int id = array[0];
 				getLogger().debug("Read id: " + id);
 				if(!validate(id)) {
-					for(int i = 1; i < length; i++) {
+					/*
+					length -= array[1];
+					for(int i = 0; i < length; i++) {
 						int ignored = input.read();
 					}
+					*/
 
 					getLogger().debug("Received unknown Packet #" + id);
-				} else {
-					Class<? extends Packet> clazz = packets.get(getState()).get(id);
-					Packet packet = clazz.newInstance();
-					getLogger().debug("Created new " + clazz.getSimpleName());
-					packet.build(input);
-					handle(packet);
+					break;
 				}
+
+				Class<? extends Packet> clazz = packets.get(getState()).get(id);
+				Packet packet = clazz.newInstance();
+				getLogger().debug("Created new " + clazz.getSimpleName());
+				packet.build(input);
+				handle(packet);
 			} catch(Exception ex) {
 				getLogger().log("Packet error! ", ex);
 				break;
@@ -161,6 +166,32 @@ public abstract class PacketStream {
 		}
 
 		setInput(new PacketInputStream(EncryptionUtil.decryptInputStream(input, key)));
+	}
+
+	private int[] getVarInt() throws IOException {
+		int[] result = new int[2];
+
+		int length = 0;
+		int i = 0;
+		int j = 0;
+		while(true) {
+			int k = input.read();
+			if(k == -1)
+				throw new IOException("End of stream");
+			length++;
+
+			i |= (k & 0x7F) << j++ * 7;
+
+			if(j > 5)
+				throw new IOException("VarInt too big");
+
+			if((k & 0x80) != 128)
+				break;
+		}
+
+		result[0] = i;
+		result[1] = length;
+		return result;
 	}
 
 }
