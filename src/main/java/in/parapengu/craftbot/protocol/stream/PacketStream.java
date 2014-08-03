@@ -92,6 +92,12 @@ public abstract class PacketStream {
 			try {
 				int length = input.readVarInt();
 				getLogger().debug("Read length: " + length);
+				if(length <= 0) {
+					getLogger().severe("Illegal packet length received: " + length);
+					close();
+					break;
+				}
+
 				int id = input.readVarInt();
 				getLogger().debug("Read id: " + id);
 				if(!validate(id)) {
