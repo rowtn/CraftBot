@@ -90,21 +90,14 @@ public abstract class PacketStream {
 	public PacketStream start() {
 		while(input != null && socket.isConnected()) {
 			try {
-				int length = input.readVarInt();
+				PacketInputArray input = new PacketInputArray(this.input);
+				input.build();
+				int length = input.getLength();
 				getLogger().debug("Read length: " + length);
-				if(length <= 0) {
-					getLogger().severe("Illegal packet length received: " + length);
-					close();
-					break;
-				}
 
-				int id = input.readVarInt();
+				int id = input.getPacketId();
 				getLogger().debug("Read id: " + id);
 				if(!validate(id)) {
-					for(int i = 1; i < length; i++) {
-						int ignored = input.read();
-					}
-
 					getLogger().debug("Received unknown Packet #" + id);
 				} else {
 					Class<? extends Packet> clazz = packets.get(getState()).get(id);
