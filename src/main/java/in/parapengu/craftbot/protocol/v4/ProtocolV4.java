@@ -27,6 +27,7 @@ import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInAnimation;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInBlockAction;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInBlockBreakAnimation;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInBlockChange;
+import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChangeGameState;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChatMessage;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChunkBulk;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChunkData;
@@ -142,6 +143,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 		play.put(0x24, PacketPlayInBlockAction.class);
 		play.put(0x25, PacketPlayInBlockBreakAnimation.class);
 		play.put(0x26, PacketPlayInChunkBulk.class);
+		play.put(0x2B, PacketPlayInChangeGameState.class);
 		play.put(0x2F, PacketPlayInSetSlot.class);
 		play.put(0x30, PacketPlayInWindowItems.class);
 		play.put(0x35, PacketPlayInUpdateTileEntity.class);
@@ -223,6 +225,8 @@ public class ProtocolV4 extends Protocol implements Listener {
 			bot.setState(State.PLAY);
 		} else if(event.getPacket() instanceof PacketPlayInKeepAlive) {
 			stream.sendPacket(new PacketPlayOutKeepAlive(((PacketPlayInKeepAlive) event.getPacket()).getAliveId()));
+		} else {
+			bot.getLogger().debug(event.getPacket());
 		}
 	}
 
