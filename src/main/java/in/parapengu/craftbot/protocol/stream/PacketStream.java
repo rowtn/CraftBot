@@ -97,11 +97,11 @@ public abstract class PacketStream {
 				int id = input.readVarInt();
 				getLogger().debug("Read id: " + id);
 				if(!validate(id)) {
-					if(length != 1) {
-						break;
+					for(int i = 1; i < length; i++) {
+						int ignored = input.read();
 					}
 
-					getLogger().debug("Received unknown Packet #" + id + ", ignoring it because it was only 1 byte long");
+					getLogger().debug("Received unknown Packet #" + id);
 				} else {
 					Class<? extends Packet> clazz = packets.get(getState()).get(id);
 					Packet packet = clazz.newInstance();
