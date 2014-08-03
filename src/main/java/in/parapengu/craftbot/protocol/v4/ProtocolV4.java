@@ -53,6 +53,7 @@ import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInHeldItemChange;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInJoinGame;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInKeepAlive;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInMultipleBlockChange;
+import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInParticle;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInPlayerAbilities;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInPlayerListItem;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInPlayerPosition;
@@ -143,6 +144,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 		play.put(0x24, PacketPlayInBlockAction.class);
 		play.put(0x25, PacketPlayInBlockBreakAnimation.class);
 		play.put(0x26, PacketPlayInChunkBulk.class);
+		play.put(0x2A, PacketPlayInParticle.class);
 		play.put(0x2B, PacketPlayInChangeGameState.class);
 		play.put(0x2F, PacketPlayInSetSlot.class);
 		play.put(0x30, PacketPlayInWindowItems.class);
