@@ -76,8 +76,8 @@ public class BotHandler {
 		if(!accountsFile.exists()) {
 			JSONArray array = new JSONArray();
 			JSONObject account = new JSONObject();
-			account.put("username", "Steve");
 			account.put("password", "password");
+			account.put("username", "Steve");
 			array.put(account);
 
 			try {
