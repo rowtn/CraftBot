@@ -46,7 +46,7 @@ public class PacketInputArray extends PacketInputStream {
 		int i = 0;
 		int j = 0;
 		while(true) {
-			int k = read();
+			int k = input.read();
 			if(k == -1)
 				throw new IOException("End of stream");
 			length++;
