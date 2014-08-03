@@ -81,8 +81,6 @@ public abstract class PacketStream {
 		getLogger().debug("Attempting to find a " + getState().name() + " packet with the id #" + id);
 		Class<? extends Packet> clazz = packets.get(getState()).get(id);
 		if(clazz == null) {
-			getLogger().severe("Could not find packet with id #" + id);
-			close();
 			return false;
 		}
 
