@@ -230,6 +230,10 @@ public class ProtocolV4 extends Protocol implements Listener {
 		} else if(event.getPacket() instanceof PacketPlayInChatMessage) {
 			String message = ((PacketPlayInChatMessage) event.getPacket()).getMessage();
 			bot.getLogger().info(message);
+		} else if(event.getPacket() instanceof PacketPlayInDisconnect) {
+			String message = ((PacketPlayInDisconnect) event.getPacket()).getReason();
+			bot.getLogger().info("Disconnected: " + message);
+			stream.close();
 		} else {
 			bot.getLogger().debug(event.getPacket());
 		}
