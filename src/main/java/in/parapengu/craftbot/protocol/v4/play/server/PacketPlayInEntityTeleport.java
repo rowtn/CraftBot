@@ -19,9 +19,9 @@ public class PacketPlayInEntityTeleport extends PacketPlayInEntity {
 	@Override
 	public void build(PacketInputStream input) throws IOException {
 		super.build(input);
-		this.x = input.readByte() / 32D;
-		this.y = input.readByte() / 32D;
-		this.z = input.readByte() / 32D;
+		this.x = input.readInt() / 32D;
+		this.y = input.readInt() / 32D;
+		this.z = input.readInt() / 32D;
 		this.yaw = (input.readByte() * 360) / 256D;
 		this.pitch = (input.readByte() * 360) / 256D;
 	}

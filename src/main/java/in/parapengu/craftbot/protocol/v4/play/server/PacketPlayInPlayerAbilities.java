@@ -30,8 +30,8 @@ public class PacketPlayInPlayerAbilities extends Packet {
 		this.flying = (flags & FLYING) != 0;
 		this.ableToFly = (flags & CAN_FLY) != 0;
 		this.invincible = (flags & GOD_MODE) != 0;
-		this.flyingSpeed = input.readInt() / 250F;
-		this.walkingSpeed = input.readInt() / 250F;
+		this.flyingSpeed = (float) input.readInt() / 250F;
+		this.walkingSpeed = (float) input.readInt() / 250F;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
+import in.parapengu.craftbot.util.ClassUtils;
 
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -52,8 +53,6 @@ public class PacketPlayInChunkData extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-
-
 	public ChunkData getChunk() {
 		return data;
 	}
@@ -96,6 +95,11 @@ public class PacketPlayInChunkData extends Packet {
 
 		public byte[] getData() {
 			return data;
+		}
+
+		@Override
+		public String toString() {
+			return ClassUtils.build(getClass(), this, true, "data");
 		}
 
 	}
@@ -153,6 +157,11 @@ public class PacketPlayInChunkData extends Packet {
 
 		public int getLength() {
 			return length;
+		}
+
+		@Override
+		public String toString() {
+			return ClassUtils.build(getClass(), this, true);
 		}
 
 	}

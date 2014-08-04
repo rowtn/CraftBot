@@ -5,12 +5,14 @@ import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
+import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChunkData.ChunkData;
+import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChunkData.ChunkInflater;
 
 import java.io.IOException;
 
 public class PacketPlayInChunkBulk extends Packet {
 
-	private PacketPlayInChunkData.ChunkData[] chunks;
+	private ChunkData[] chunks;
 	private boolean skylight;
 
 	public PacketPlayInChunkBulk() {
@@ -19,14 +21,14 @@ public class PacketPlayInChunkBulk extends Packet {
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		PacketPlayInChunkData.ChunkData[] chunks = new PacketPlayInChunkData.ChunkData[input.readShort()];
+		ChunkData[] chunks = new ChunkData[input.readShort()];
 		int length = input.readInt();
 		this.skylight = input.readBoolean();
 
 		byte[] compressed = new byte[length];
-		input.readFully(compressed, 0, length);
+		input.readFully(compressed);
 		byte[] data = new byte[196864 * chunks.length];
-		PacketPlayInChunkData.ChunkInflater inflater = new PacketPlayInChunkData.ChunkInflater(getClass(), data, compressed, length);
+		ChunkInflater inflater = new ChunkInflater(getClass(), data, compressed, length);
 		inflater.inflate();
 
 		int dataPosition = 0;
@@ -52,7 +54,7 @@ public class PacketPlayInChunkBulk extends Packet {
 			System.arraycopy(data, dataPosition, chunkData, 0, dataLength);
 			dataPosition += dataLength;
 
-			chunks[i] = new PacketPlayInChunkData.ChunkData(x, z, primaryBitmask, secondaryBitmask, chunkData);
+			chunks[i] = new ChunkData(x, z, primaryBitmask, secondaryBitmask, chunkData);
 		}
 		this.chunks = chunks;
 	}
@@ -62,7 +64,7 @@ public class PacketPlayInChunkBulk extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public PacketPlayInChunkData.ChunkData[] getChunks() {
+	public ChunkData[] getChunks() {
 		return chunks;
 	}
 

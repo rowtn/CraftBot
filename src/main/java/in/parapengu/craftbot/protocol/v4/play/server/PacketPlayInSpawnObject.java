@@ -31,13 +31,12 @@ public class PacketPlayInSpawnObject extends Packet {
 	@Override
 	public void build(PacketInputStream input) throws IOException {
 		this.entity = input.readVarInt();
-		this.type = input.read();
+		this.type = input.readByte();
 		this.x = input.readInt() / 32D;
 		this.y = input.readInt() / 32D;
 		this.z = input.readInt() / 32D;
 		this.yaw = (input.readByte() * 360) / 256D;
 		this.pitch = (input.readByte() * 360) / 256D;
-		this.yaw = (input.readByte() * 360) / 256D;
 		this.data = input.readInt();
 		if(data != 0) {
 			this.vX = input.readShort() / 8000D;

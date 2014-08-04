@@ -102,22 +102,19 @@ public abstract class PacketStream {
 				int id = array[0];
 				getLogger().debug("Read id: " + id);
 				if(!validate(id)) {
-					/*
 					length -= array[1];
 					for(int i = 0; i < length; i++) {
 						int ignored = input.read();
 					}
-					*/
 
 					getLogger().debug("Received unknown Packet #" + id);
-					break;
+				} else {
+					Class<? extends Packet> clazz = packets.get(getState()).get(id);
+					Packet packet = clazz.newInstance();
+					getLogger().debug("Created new " + clazz.getSimpleName());
+					packet.build(input);
+					handle(packet);
 				}
-
-				Class<? extends Packet> clazz = packets.get(getState()).get(id);
-				Packet packet = clazz.newInstance();
-				getLogger().debug("Created new " + clazz.getSimpleName());
-				packet.build(input);
-				handle(packet);
 			} catch(Exception ex) {
 				getLogger().log("Packet error! ", ex);
 				break;

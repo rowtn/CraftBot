@@ -8,6 +8,7 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class PacketPlayInDisconnect extends Packet {
 
@@ -20,6 +21,7 @@ public class PacketPlayInDisconnect extends Packet {
 	@Override
 	public void build(PacketInputStream input) throws IOException {
 		this.reason = new JSONObject(input.readString());
+		Logger.getLogger(null).info("Disconnected: " + reason.toString());
 	}
 
 	@Override
