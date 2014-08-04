@@ -5,14 +5,13 @@ import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
-import org.json.JSONObject;
+import in.parapengu.craftbot.util.ChatFormatter;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class PacketPlayInDisconnect extends Packet {
 
-	private JSONObject reason;
+	private String reason;
 
 	public PacketPlayInDisconnect() {
 		super(0x40);
@@ -20,8 +19,8 @@ public class PacketPlayInDisconnect extends Packet {
 
 	@Override
 	public void build(PacketInputStream input) throws IOException {
-		this.reason = new JSONObject(input.readString());
-		Logger.getLogger(null).info("Disconnected: " + reason.toString());
+		String string = input.readString();
+		this.reason = ChatFormatter.parse(string);
 	}
 
 	@Override
@@ -29,7 +28,7 @@ public class PacketPlayInDisconnect extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public JSONObject getReason() {
+	public String getReason() {
 		return reason;
 	}
 
