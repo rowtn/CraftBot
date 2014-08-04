@@ -236,8 +236,11 @@ public class ProtocolV4 extends Protocol implements Listener {
 			bot.getLogger().info("Disconnected: " + message);
 			stream.close();
 		} else if(event.getPacket() instanceof PacketPlayInUpdateHealth) {
-			int health = (int) ((PacketPlayInUpdateHealth) event.getPacket()).getHealth();
+			float fl = ((PacketPlayInUpdateHealth) event.getPacket()).getHealth();
+			int health = (int) fl;
+			bot.getLogger().info("Health is " + health);
 			if(health <= 0) {
+				bot.getLogger().info("Attempting to respawn!");
 				stream.sendPacket(new PacketPlayOutClientStatus(0));
 			}
 		} else {
