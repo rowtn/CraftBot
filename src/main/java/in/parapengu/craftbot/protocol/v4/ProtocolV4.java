@@ -22,6 +22,7 @@ import in.parapengu.craftbot.protocol.v4.login.server.PacketLoginInEncryptionReq
 import in.parapengu.craftbot.protocol.v4.login.server.PacketLoginInSuccess;
 import in.parapengu.craftbot.protocol.v4.login.client.PacketLoginOutEncryptionResponse;
 import in.parapengu.craftbot.protocol.v4.login.client.PacketLoginOutStart;
+import in.parapengu.craftbot.protocol.v4.play.client.PacketPlayOutClientStatus;
 import in.parapengu.craftbot.protocol.v4.play.client.PacketPlayOutKeepAlive;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInAnimation;
 import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInBlockAction;
@@ -234,6 +235,11 @@ public class ProtocolV4 extends Protocol implements Listener {
 			String message = ((PacketPlayInDisconnect) event.getPacket()).getReason();
 			bot.getLogger().info("Disconnected: " + message);
 			stream.close();
+		} else if(event.getPacket() instanceof PacketPlayInUpdateHealth) {
+			int health = (int) ((PacketPlayInUpdateHealth) event.getPacket()).getHealth();
+			if(health <= 0) {
+				stream.sendPacket(new PacketPlayOutClientStatus(0));
+			}
 		} else {
 			bot.getLogger().debug(event.getPacket());
 		}
