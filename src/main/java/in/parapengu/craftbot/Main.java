@@ -88,7 +88,7 @@ public class Main {
 
 		try {
 			ConsoleReader console = new ConsoleReader();
-			console.setPrompt("> ");
+			// console.setPrompt("> ");
 			console.setCompletionHandler((reader, candidates, position) -> {
 				bot.getLogger().info(candidates);
 				return false;
