@@ -227,6 +227,9 @@ public class ProtocolV4 extends Protocol implements Listener {
 			bot.setState(State.PLAY);
 		} else if(event.getPacket() instanceof PacketPlayInKeepAlive) {
 			stream.sendPacket(new PacketPlayOutKeepAlive(((PacketPlayInKeepAlive) event.getPacket()).getAliveId()));
+		} else if(event.getPacket() instanceof PacketPlayInChatMessage) {
+			String message = ((PacketPlayInChatMessage) event.getPacket()).getMessage();
+			bot.getLogger().info(message);
 		} else {
 			bot.getLogger().debug(event.getPacket());
 		}
