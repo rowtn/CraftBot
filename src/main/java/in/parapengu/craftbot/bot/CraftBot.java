@@ -6,6 +6,7 @@ import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
+import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.State;
 import in.parapengu.craftbot.protocol.stream.BotPacketStream;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
@@ -13,12 +14,11 @@ import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import in.parapengu.craftbot.protocol.v4.ProtocolV4;
 import in.parapengu.craftbot.protocol.v4.play.client.PacketPlayOutChatMessage;
 import in.parapengu.craftbot.server.ServerPinger;
+import in.parapengu.craftbot.world.World;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class CraftBot {
 
@@ -39,6 +39,8 @@ public class CraftBot {
 	private PacketOutputStream output;
 	private PacketInputStream input;
 	private BotPacketStream packetStream;
+
+	private World world;
 
 	public CraftBot(String account, String password, boolean authenticate) throws Exception {
 		if(authenticate) {
@@ -131,6 +133,14 @@ public class CraftBot {
 
 	public void setPacketStream(BotPacketStream packetStream) {
 		this.packetStream = packetStream;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public void setWorld(World world) {
+		this.world = world;
 	}
 
 	public void connect(String address, int port) {

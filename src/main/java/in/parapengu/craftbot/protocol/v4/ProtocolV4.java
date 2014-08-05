@@ -22,6 +22,8 @@ import in.parapengu.craftbot.protocol.v4.login.server.*;
 import in.parapengu.craftbot.protocol.v4.play.client.*;
 import in.parapengu.craftbot.protocol.v4.play.server.*;
 import in.parapengu.craftbot.util.ClassUtils;
+import in.parapengu.craftbot.world.World;
+import in.parapengu.craftbot.world.impl.CraftBotWorld;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -211,9 +213,32 @@ public class ProtocolV4 extends Protocol implements Listener {
 				bot.getLogger().info("Attempting to respawn!");
 				stream.sendPacket(new PacketPlayOutClientStatus(0));
 			}
+		} else if(event.getPacket() instanceof PacketPlayInJoinGame) {
+			handleJoinPacket((PacketPlayInJoinGame) event.getPacket());
+		} else if(event.getPacket() instanceof PacketPlayInTimeUpdate) {
+			handleTimeUpdate((PacketPlayInTimeUpdate) event.getPacket());
+		} else if(event.getPacket() instanceof PacketPlayInChunkData) {
+			bot.getWorld().loadChunk(((PacketPlayInChunkData) event.getPacket()).getChunk());
+		} else if(event.getPacket() instanceof PacketPlayInChunkBulk) {
+			for(PacketPlayInChunkData.ChunkData chunk : ((PacketPlayInChunkBulk) event.getPacket()).getChunks()) {
+				bot.getWorld().loadChunk(chunk);
+			}
 		} else {
 			bot.getLogger().debug(event.getPacket());
 		}
+	}
+
+	private void handleJoinPacket(PacketPlayInJoinGame joinGame) {
+		// TODO better chunk initialization & management
+		CraftBotWorld world = new CraftBotWorld(new PacketPlayInChunkData.ChunkData[100][100]);
+		world.setDifficulty(World.Difficulty.byId(joinGame.getDifficulty()));
+		world.setDimension(World.Dimension.byId(joinGame.getDimension()));
+		bot.setWorld(world);
+	}
+
+	private void handleTimeUpdate(PacketPlayInTimeUpdate timeUpdate) {
+		bot.getWorld().setAge(timeUpdate.getAge());
+		bot.getWorld().setTime(timeUpdate.getTime());
 	}
 
 	@EventHandler
