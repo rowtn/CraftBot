@@ -5,13 +5,7 @@ import in.parapengu.commons.reflection.SimpleObject;
 import in.parapengu.commons.utils.file.TextFile;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandHandler;
-import in.parapengu.craftbot.command.commands.ConnectCommand;
-import in.parapengu.craftbot.command.commands.DebugCommand;
-import in.parapengu.craftbot.command.commands.HelpCommand;
-import in.parapengu.craftbot.command.commands.PingCommand;
-import in.parapengu.craftbot.command.commands.PluginsCommand;
-import in.parapengu.craftbot.command.commands.ReloadCommand;
-import in.parapengu.craftbot.command.commands.StopCommand;
+import in.parapengu.craftbot.command.commands.*;
 import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
@@ -61,6 +55,7 @@ public class BotHandler {
 		pluginsFolder = (File) options.valueOf("p");
 		plugins = new ArrayList<>();
 		manager = new EventManager();
+
 		register(new ConnectCommand());
 		register(new DebugCommand());
 		register(new HelpCommand());
@@ -68,6 +63,8 @@ public class BotHandler {
 		register(new PluginsCommand());
 		register(new ReloadCommand());
 		register(new StopCommand());
+		register(new ChatCommands.LocalChat());
+		register(new ChatCommands.GlobalChat());
 
 		long start = System.currentTimeMillis();
 		reload(false);

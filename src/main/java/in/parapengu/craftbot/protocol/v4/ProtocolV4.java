@@ -124,6 +124,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 			bot.setSocket(socket);
 			bot.setOutput(output);
 			bot.setInput(input);
+
 		} catch(IOException ex) {
 			bot.getLogger().log("Could not connect to " + address + (port != 25565 ? ":" + port : "") + ": ", ex);
 			return;
@@ -135,6 +136,8 @@ public class ProtocolV4 extends Protocol implements Listener {
 		bot.setState(State.LOGIN);
 		stream.sendPacket(new PacketHandshakeOutStatus(this, address, port, State.LOGIN));
 		stream.sendPacket(new PacketLoginOutStart(bot.getUsername()));
+
+		bot.setPacketStream(stream);
 	}
 
 	@EventHandler

@@ -110,7 +110,7 @@ public class Main {
 		}
 	}
 
-	public static List<String> asList(String... params) {
+	private static List<String> asList(String... params) {
 		return Lists.newArrayList(params);
 	}
 
