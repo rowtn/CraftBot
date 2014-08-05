@@ -31,6 +31,8 @@ public class Main {
 		OptionSpec<SimpleDateFormat> dateFormat = parser.acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)").withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
 		OptionSpec<File> accountsFile = parser.acceptsAll(asList("a", "accounts"), "Specifies the accounts file").withRequiredArg().ofType(File.class).defaultsTo(new File("accounts.json")).describedAs("Accounts filename");
 		OptionSpec<File> pluginsFolder = parser.acceptsAll(asList("p", "plugins"), "Specifies the plugins folder").withRequiredArg().ofType(File.class).defaultsTo(new File("plugins")).describedAs("Plugins folder name");
+		OptionSpec<Boolean> offline = parser.acceptsAll(asList("o", "offline"), "Whether to enable offline mode").withRequiredArg().ofType(Boolean.class).defaultsTo(false).describedAs("Offline mode");
+		OptionSpec<Integer> bots = parser.acceptsAll(asList("b", "bots"), "How many bots to load in (requires offline mode)").withRequiredArg().ofType(Integer.class).describedAs("Bot count");
 
 		OptionSet options;
 		try {

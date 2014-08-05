@@ -93,21 +93,38 @@ public class BotHandler {
 			return;
 		}
 
-		List<String> lines;
-		try {
-			lines = Files.readAllLines(accountsFile.toPath(), Charsets.UTF_8);
-		} catch(IOException ex) {
-			throw new IllegalArgumentException("Could not read accounts from " + accountsFile.getPath());
-		}
+		boolean offline = (boolean) options.valueOf("o");
+		if(!offline || !options.has("b")) {
+			List<String> lines;
+			try {
+				lines = Files.readAllLines(accountsFile.toPath(), Charsets.UTF_8);
+			} catch(IOException ex) {
+				throw new IllegalArgumentException("Could not read accounts from " + accountsFile.getPath());
+			}
 
-		StringBuilder builder = new StringBuilder();
-		lines.forEach(builder::append);
+			StringBuilder builder = new StringBuilder();
+			lines.forEach(builder::append);
 
-		JSONArray accounts = new JSONArray(builder.toString());
-		for(int i = 0; i < accounts.length(); i++) {
-			final JSONObject object = accounts.getJSONObject(i);
-			/*
-			new Thread(() -> {
+			JSONArray accounts = new JSONArray(builder.toString());
+			for(int i = 0; i < accounts.length(); i++) {
+				final JSONObject object = accounts.getJSONObject(i);
+				/*
+				new Thread(() -> {
+					String username;
+					String password;
+					try {
+						username = object.getString("username");
+						password = object.getString("password");
+					} catch(JSONException ex) {
+						logger.info("Error while parsing " + accountsFile.toPath() + ": " + ex.getMessage());
+						loaded++;
+						return;
+					}
+
+					register(username, password);
+					loaded++;
+				}).start();
+				*/
 				String username;
 				String password;
 				try {
@@ -119,28 +136,20 @@ public class BotHandler {
 					return;
 				}
 
-				register(username, password);
+				register(username, password, !offline);
 				loaded++;
-			}).start();
-			*/
-			String username;
-			String password;
-			try {
-				username = object.getString("username");
-				password = object.getString("password");
-			} catch(JSONException ex) {
-				logger.info("Error while parsing " + accountsFile.toPath() + ": " + ex.getMessage());
-				loaded++;
-				return;
 			}
 
-			register(username, password);
-			loaded++;
+			while(accounts.length() > loaded) {
+				logger.debug("Loaded " + loaded + " out of " + accounts.length() + " bots");
+			}
+		} else if(options.has("b")) {
+			int count = (int) options.valueOf("b");
+			for(int i = 1; i <= count; i++) {
+				register("bot" + i, null, false);
+			}
 		}
 
-		while(accounts.length() > loaded) {
-			logger.debug("Loaded " + loaded + " out of " + accounts.length() + " bots");
-		}
 		logger.info("Loaded " + bots.size() + " account" + (bots.size() != 0 ? "s" : ""));
 
 		for(BotPlugin plugin : plugins) {
@@ -186,22 +195,26 @@ public class BotHandler {
 		return results;
 	}
 
-	public void register(String username, String password) {
+	public void register(String username, String password, boolean authenticate) {
 		CraftBot bot;
 		try {
-			bot = new CraftBot(username, password);
+			bot = new CraftBot(username, password, authenticate);
 		} catch(Exception ex) {
 			logger.log("Error while authenticating " + username + ": ", ex);
 			return;
 		}
 
-		String uuid = bot.getUUID();
-		if(bots.get(uuid) != null) {
-			logger.warning(bot.getUsername() + " (" + uuid + ") is already a registered bot");
+		String identifier = authenticate ? bot.getUUID() : bot.getUsername();
+		if(bots.get(identifier) != null) {
+			if(authenticate) {
+				logger.warning(bot.getUsername() + " (" + bot.getUUID() + ") is already a registered bot");
+			} else {
+				logger.warning(bot.getUsername() + " is already a registered bot");
+			}
 			return;
 		}
 
-		bots.put(uuid, bot);
+		bots.put(identifier, bot);
 	}
 
 	public void command(String[] params) {

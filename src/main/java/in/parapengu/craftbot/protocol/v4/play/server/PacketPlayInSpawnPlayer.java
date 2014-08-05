@@ -103,6 +103,7 @@ public class PacketPlayInSpawnPlayer extends Packet {
 	}
 
 	public static class PlayerProperty {
+
 		private String name;
 		private String value;
 		private String signature;

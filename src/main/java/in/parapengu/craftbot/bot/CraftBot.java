@@ -19,6 +19,8 @@ import java.util.UUID;
 
 public class CraftBot {
 
+	private static int id = 1;
+
 	private Logger logger;
 	private EventManager manager;
 
@@ -34,13 +36,19 @@ public class CraftBot {
 	private PacketOutputStream output;
 	private PacketInputStream input;
 
-	public CraftBot(String account, String password) throws Exception {
-		auth = new YggdrasilAuthService();
-		session = auth.login(account, password);
-		username = session.getSelectedProfile().getName();
-		uuid = session.getSelectedProfile().getId();
-		clientToken = session.getClientToken();
-		accessToken = session.getAccessToken();
+	public CraftBot(String account, String password, boolean authenticate) throws Exception {
+		if(authenticate) {
+			auth = new YggdrasilAuthService();
+			session = auth.login(account, password);
+			username = session.getSelectedProfile().getName();
+			uuid = session.getSelectedProfile().getId();
+			clientToken = session.getClientToken();
+			accessToken = session.getAccessToken();
+		} else {
+			username = account.contains("@") ? "bot" + id : account;
+			uuid = UUID.randomUUID().toString().replace("-", "");
+			id++;
+		}
 
 		logger = Logging.getLogger(username, BotHandler.getHandler().getLogger());
 		logger.info("Connected as " + username + " (" + uuid + ")");

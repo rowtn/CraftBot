@@ -34,8 +34,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ProtocolV4 extends Protocol implements Listener {
 
@@ -177,6 +175,7 @@ public class ProtocolV4 extends Protocol implements Listener {
 			bot.getLogger().info("Logged in successfully!");
 			bot.setState(State.PLAY);
 
+			/*
 			new Thread(() -> {
 				Timer timer = new Timer();
 				timer.schedule(new TimerTask() {
@@ -189,8 +188,9 @@ public class ProtocolV4 extends Protocol implements Listener {
 
 						stream.sendPacket(new PacketPlayOutKeepAlive((int) (System.nanoTime() / 1000000L)));
 					}
-				}, 100L, 5000L);
+				}, 0L, 5000L);
 			}).start();
+			*/
 		} else if(event.getPacket() instanceof PacketPlayInKeepAlive) {
 			stream.sendPacket(new PacketPlayOutKeepAlive(((PacketPlayInKeepAlive) event.getPacket()).getAliveId()));
 		} else if(event.getPacket() instanceof PacketPlayInChatMessage) {
