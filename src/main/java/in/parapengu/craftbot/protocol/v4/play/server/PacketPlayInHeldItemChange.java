@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class PacketPlayInHeldItemChange extends Packet {
 
-	private byte slot;
+	private int slot;
 
 	public PacketPlayInHeldItemChange() {
 		super(0x09);
@@ -26,7 +26,7 @@ public class PacketPlayInHeldItemChange extends Packet {
 		throw new PacketException("Can not send an inbound packet", getClass(), Destination.SERVER);
 	}
 
-	public byte getSlot() {
+	public int getSlot() {
 		return slot;
 	}
 

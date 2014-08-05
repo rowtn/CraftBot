@@ -2,6 +2,7 @@ package in.parapengu.craftbot.protocol.v4.play.server;
 
 import com.google.common.collect.Lists;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
+import in.parapengu.craftbot.util.ClassUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +72,11 @@ public class PacketPlayInEntityProperties extends PacketPlayInEntity {
 			modifiers.add(new Modifier(uuid, amount, operation));
 		}
 
+		@Override
+		public String toString() {
+			return ClassUtils.build(getClass(), this, true);
+		}
+
 	}
 
 	public static class Modifier {
@@ -95,6 +101,11 @@ public class PacketPlayInEntityProperties extends PacketPlayInEntity {
 
 		public int getOperation() {
 			return operation;
+		}
+
+		@Override
+		public String toString() {
+			return ClassUtils.build(getClass(), this, true);
 		}
 
 	}

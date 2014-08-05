@@ -6,6 +6,7 @@ import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.DataObject;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
+import in.parapengu.craftbot.util.ClassUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -102,7 +103,9 @@ public class PacketPlayInSpawnPlayer extends Packet {
 	}
 
 	public static class PlayerProperty {
-		private final String name, value, signature;
+		private String name;
+		private String value;
+		private String signature;
 
 		private PlayerProperty(String name, String value, String signature) {
 			this.name = name;
@@ -121,6 +124,12 @@ public class PacketPlayInSpawnPlayer extends Packet {
 		public String getSignature() {
 			return signature;
 		}
+
+		@Override
+		public String toString() {
+			return ClassUtils.build(getClass(), this, true);
+		}
+
 	}
 
 }

@@ -1,5 +1,7 @@
 package in.parapengu.craftbot.material;
 
+import in.parapengu.craftbot.util.ClassUtils;
+
 public class MaterialData {
 
 	private final int type;
@@ -32,6 +34,11 @@ public class MaterialData {
 
 	public byte getData() {
 		return data;
+	}
+
+	@Override
+	public String toString() {
+		return ClassUtils.build(getClass(), this, true);
 	}
 
 }

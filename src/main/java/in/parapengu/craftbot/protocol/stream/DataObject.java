@@ -1,8 +1,11 @@
 package in.parapengu.craftbot.protocol.stream;
 
+import in.parapengu.craftbot.util.ClassUtils;
+
 public class DataObject<T extends Object> {
 
-	private final int id, type;
+	private int id;
+	private int type;
 	private T object;
 
 	public DataObject(int type, int id, T object) {
@@ -25,6 +28,11 @@ public class DataObject<T extends Object> {
 
 	public int getObjectType() {
 		return type;
+	}
+
+	@Override
+	public String toString() {
+		return ClassUtils.build(getClass(), this, true);
 	}
 
 }

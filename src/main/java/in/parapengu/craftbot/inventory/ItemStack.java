@@ -3,6 +3,7 @@ package in.parapengu.craftbot.inventory;
 import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
 import in.parapengu.craftbot.material.Material;
 import in.parapengu.craftbot.material.MaterialData;
+import in.parapengu.craftbot.util.ClassUtils;
 
 public class ItemStack {
 
@@ -123,6 +124,11 @@ public class ItemStack {
 		} else {
 			this.data = mat.getData(data);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return ClassUtils.build(getClass(), this, true);
 	}
 
 }
