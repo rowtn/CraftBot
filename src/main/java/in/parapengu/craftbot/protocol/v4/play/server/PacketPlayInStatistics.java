@@ -6,9 +6,10 @@ import in.parapengu.craftbot.protocol.PacketException;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 
-import static in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInStatistics.StatisticType.*;
-
 import java.io.IOException;
+
+import static in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInStatistics.StatisticType.ACHIEVEMENT;
+import static in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInStatistics.StatisticType.STATISTIC;
 
 public class PacketPlayInStatistics extends Packet {
 

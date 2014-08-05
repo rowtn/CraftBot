@@ -7,10 +7,10 @@ import in.parapengu.craftbot.protocol.stream.GlobalPacketStream;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
 import in.parapengu.craftbot.protocol.stream.PacketOutputStream;
 import in.parapengu.craftbot.protocol.v4.handshaking.PacketHandshakeOutStatus;
-import in.parapengu.craftbot.protocol.v4.status.server.PacketStatusInResponse;
-import in.parapengu.craftbot.protocol.v4.status.server.PacketStatusInTime;
 import in.parapengu.craftbot.protocol.v4.status.client.PacketStatusOutRequest;
 import in.parapengu.craftbot.protocol.v4.status.client.PacketStatusOutTime;
+import in.parapengu.craftbot.protocol.v4.status.server.PacketStatusInResponse;
+import in.parapengu.craftbot.protocol.v4.status.server.PacketStatusInTime;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;

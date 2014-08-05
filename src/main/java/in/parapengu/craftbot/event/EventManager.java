@@ -2,7 +2,6 @@ package in.parapengu.craftbot.event;
 
 import com.google.common.collect.Lists;
 import in.parapengu.craftbot.bot.BotHandler;
-import in.parapengu.craftbot.event.packet.SendPacketEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 

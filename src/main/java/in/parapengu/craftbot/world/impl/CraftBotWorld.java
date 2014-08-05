@@ -6,8 +6,6 @@ import in.parapengu.craftbot.protocol.v4.play.server.PacketPlayInChunkData;
 import in.parapengu.craftbot.world.Block;
 import in.parapengu.craftbot.world.World;
 
-import java.util.Arrays;
-
 /**
  * Created by August on 8/5/14.
  */

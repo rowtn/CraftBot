@@ -2,7 +2,6 @@ package in.parapengu.craftbot;
 
 import com.google.common.collect.Lists;
 import in.parapengu.craftbot.bot.BotHandler;
-import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;

@@ -6,7 +6,6 @@ import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.event.bot.connection.BotConnectServerEvent;
 import in.parapengu.craftbot.logging.Logger;
 import in.parapengu.craftbot.logging.Logging;
-import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.State;
 import in.parapengu.craftbot.protocol.stream.BotPacketStream;
 import in.parapengu.craftbot.protocol.stream.PacketInputStream;
@@ -18,7 +17,8 @@ import in.parapengu.craftbot.world.World;
 
 import java.math.BigInteger;
 import java.net.Socket;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 
 public class CraftBot {
 

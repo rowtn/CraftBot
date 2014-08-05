@@ -2,7 +2,6 @@ package in.parapengu.craftbot.logging;
 
 import in.parapengu.craftbot.bot.ChatColor;
 import in.parapengu.craftbot.util.ClassUtils;
-import jline.console.ConsoleReader;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

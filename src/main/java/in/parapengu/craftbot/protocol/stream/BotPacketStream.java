@@ -3,12 +3,10 @@ package in.parapengu.craftbot.protocol.stream;
 import in.parapengu.craftbot.bot.CraftBot;
 import in.parapengu.craftbot.event.EventManager;
 import in.parapengu.craftbot.logging.Logger;
-import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.Protocol;
 import in.parapengu.craftbot.protocol.State;
 
 import java.net.Socket;
-import java.util.Map;
 
 public class BotPacketStream extends PacketStream {
 

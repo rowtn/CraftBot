@@ -1,7 +1,6 @@
 package in.parapengu.craftbot.protocol.v4.play.server;
 
 import in.parapengu.craftbot.inventory.nbt.NBTTagCompound;
-import in.parapengu.craftbot.material.MaterialData;
 import in.parapengu.craftbot.protocol.Destination;
 import in.parapengu.craftbot.protocol.Packet;
 import in.parapengu.craftbot.protocol.PacketException;

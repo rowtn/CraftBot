@@ -1,6 +1,5 @@
 package in.parapengu.craftbot.command.commands;
 
-import in.parapengu.craftbot.bot.BotHandler;
 import in.parapengu.craftbot.command.CommandContext;
 import in.parapengu.craftbot.command.CommandException;
 import in.parapengu.craftbot.command.CommandHandler;
